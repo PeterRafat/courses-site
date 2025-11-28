@@ -1,0 +1,105 @@
+<div class="quiz-container" *ngIf="quiz as q; else loading">
+  <!-- Quiz Header -->
+  <div class="quiz-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h2 class="quiz-title mb-2">
+          <i class="bi bi-pencil-square me-2"></i>{{ q.quizTitle }}
+        </h2>
+        <p class="text-muted mb-0">{{ q.description }}</p>
+      </div>
+      <div class="quiz-stats">
+        <span class="badge bg-primary fs-6 me-2">
+          <i class="bi bi-question-circle me-1"></i>{{ q.totalQuestions }} أسئلة
+        </span>
+        <span class="badge fs-6" [class.bg-danger]="timeRemaining < 60" [class.bg-warning]="timeRemaining >= 60 && timeRemaining < 180" [class.bg-success]="timeRemaining >= 180" *ngIf="!result">
+          <i class="bi bi-clock me-1"></i>{{ getFormattedTime() }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMsg" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>{{ errorMsg }}
+  </div>
+
+  <!-- Quiz Form -->
+  <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="form && !result">
+    <div class="questions-container">
+      <div class="question-card" *ngFor="let qu of startData?.questions || []; let i = index">
+        <div class="question-header">
+          <span class="question-number">{{ qu.orderIndex }}</span>
+          <div class="question-text">{{ qu.questionText }}</div>
+        </div>
+
+        <div class="answers-container">
+          <!-- Multiple Choice (Type 0) -->
+          <div *ngIf="qu.questionType === 0" class="answer-options">
+            <div class="answer-option" *ngFor="let ans of getAnswersFor(qu.id)">
+              <input class="form-check-input" type="radio" [value]="ans.id" [formControlName]="'q_' + qu.id" [id]="'q' + qu.id + '_a' + ans.id">
+              <label class="form-check-label" [for]="'q' + qu.id + '_a' + ans.id">
+                {{ ans.answerText }}
+              </label>
+            </div>
+          </div>
+
+          <!-- True/False (Type 1) -->
+          <div *ngIf="qu.questionType === 1" class="answer-options">
+            <div class="answer-option" *ngFor="let ans of getAnswersFor(qu.id)">
+              <input class="form-check-input" type="radio" [value]="ans.id" [formControlName]="'q_' + qu.id" [id]="'q' + qu.id + '_a' + ans.id">
+              <label class="form-check-label" [for]="'q' + qu.id + '_a' + ans.id">
+                {{ ans.answerText }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-section mt-4">
+      <button class="btn btn-primary btn-lg" type="submit" [disabled]="quizSubmitted">
+        <i class="bi bi-check-circle me-2"></i>
+        {{ quizSubmitted ? 'جاري الإرسال...' : 'إرسال الإجابات' }}
+      </button>
+    </div>
+  </form>
+
+  <!-- Result Section -->
+  <div *ngIf="result" class="result-container">
+    <div class="result-card" [class.result-passed]="result.isPassed" [class.result-failed]="!result.isPassed">
+      <div class="result-icon">
+        <i class="bi" [class.bi-trophy-fill]="result.isPassed" [class.bi-x-circle-fill]="!result.isPassed"></i>
+      </div>
+      <h3 class="result-title">{{ result.isPassed ? 'تهانينا! لقد نجحت' : 'للأسف، لم تنجح' }}</h3>
+      <div class="result-score">{{ result.score }}%</div>
+      <div class="result-details">
+        <div class="result-detail-item">
+          <i class="bi bi-check-circle-fill text-success"></i>
+          <span>إجابات صحيحة: {{ result.correctAnswers }}/{{ result.totalQuestions }}</span>
+        </div>
+        <div class="result-detail-item">
+          <i class="bi bi-x-circle-fill text-danger"></i>
+          <span>إجابات خاطئة: {{ result.totalQuestions - result.correctAnswers }}/{{ result.totalQuestions }}</span>
+        </div>
+      </div>
+      <div class="result-actions mt-4">
+        <button class="btn btn-outline-primary btn-lg" (click)="retryQuiz()">
+          <i class="bi bi-arrow-clockwise me-2"></i>محاولة أخرى
+        </button>
+        <a class="btn btn-secondary btn-lg ms-2" [routerLink]="['/courses']">
+          <i class="bi bi-house-door me-2"></i>العودة للكورسات
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">جاري التحميل...</span>
+    </div>
+    <p class="mt-3 text-muted">جاري تحميل الكويز...</p>
+  </div>
+</ng-template>

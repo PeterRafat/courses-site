@@ -1,0 +1,19 @@
+.bg-light{background:#f8f9fa!important}
+
+/* Footer: use natural flow (not fixed). Use sticky-footer layout via app-root flex.
+   Footer will sit after the page content and remain at the bottom when content is short. */
+footer.footer-dark {
+  position: relative;
+  width: 100%;
+  box-shadow: 0 -6px 20px rgba(0,0,0,0.06);
+  padding: 0.75rem 0;
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 767px) {
+  footer.footer-dark {
+    box-shadow: none;
+    padding: 0.75rem 0.5rem;
+  }
+}

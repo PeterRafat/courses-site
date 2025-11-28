@@ -1,0 +1,303 @@
+<div class="container"><div class="admin-container">
+  <!-- Header -->
+  <div class="admin-header">
+    <div class="admin-header-title">
+      <i class="bi bi-speedometer2 admin-header-icon"></i>
+      لوحة تحكم الأدمن
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="admin-nav-tabs">
+
+    <a routerLink="/admin/courses" routerLinkActive="active">
+      <i class="bi bi-book"></i> الكورسات
+    </a>
+    <a routerLink="/admin/videos" routerLinkActive="active">
+      <i class="bi bi-camera-video"></i> الفيديوهات
+    </a>
+    <a routerLink="/admin/quizzes" routerLinkActive="active">
+      <i class="bi bi-patch-question"></i> الكويزات
+    </a>
+    <a routerLink="/admin/assign" routerLinkActive="active">
+      <i class="bi bi-person-plus"></i> تعيين كورس
+    </a>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="errorMsg" class="admin-alert admin-alert-danger">
+    <i class="bi bi-exclamation-triangle admin-alert-icon"></i>
+    <div>{{ errorMsg }}</div>
+  </div>
+  <div *ngIf="successMsg" class="admin-alert admin-alert-success">
+    <i class="bi bi-check-circle admin-alert-icon"></i>
+    <div>{{ successMsg }}</div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="admin-grid">
+    <!-- Create Course Card -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <i class="bi bi-book-plus admin-card-header-icon"></i>
+        إضافة كورس جديد
+      </div>
+      <div class="admin-card-body">
+        <form [formGroup]="courseForm" (ngSubmit)="createCourse()">
+          <div class="admin-form-group">
+            <label class="admin-form-label">اسم الكورس *</label>
+            <input class="form-control admin-form-control" formControlName="courseName" placeholder="أدخل اسم الكورس" />
+            <div *ngIf="courseForm.get('courseName')?.invalid && courseForm.get('courseName')?.touched" class="admin-error-text">
+              <i class="bi bi-exclamation-circle me-1"></i>اسم الكورس مطلوب
+            </div>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">الوصف</label>
+            <textarea class="form-control admin-form-control" rows="3" formControlName="description" placeholder="أدخل وصف الكورس"></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="admin-form-group">
+                <label class="admin-form-label">السعر (جنيه)</label>
+                <input class="form-control admin-form-control" type="number" formControlName="price" placeholder="0.00" />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="admin-form-group">
+                <label class="admin-form-label">الصورة (رابط)</label>
+                <input class="form-control admin-form-control" formControlName="courseImage" placeholder="https://..." />
+              </div>
+            </div>
+          </div>
+          <div class="admin-form-check">
+            <input class="admin-form-check-input" type="checkbox" formControlName="isFree" id="courseFree" />
+            <label class="admin-form-check-label" for="courseFree">كورس مجاني</label>
+          </div>
+          <div class="admin-card-footer">
+            <button class="admin-btn admin-btn-primary" type="submit" [disabled]="courseForm.invalid || loading">
+              <i class="bi bi-save"></i>
+              {{ loading ? 'جاري الحفظ...' : 'حفظ الكورس' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Assign Course Card -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <i class="bi bi-person-plus admin-card-header-icon"></i>
+        تعيين كورس لمستخدم
+      </div>
+      <div class="admin-card-body">
+        <form [formGroup]="assignForm" (ngSubmit)="assign()">
+          <div class="admin-form-group">
+            <label class="admin-form-label">المستخدم *</label>
+            <select class="form-select admin-form-select" formControlName="userId">
+              <option [value]="null">اختر مستخدم</option>
+              <option *ngFor="let u of users" [value]="u.userId">{{ u.fullName }} ({{ u.email }})</option>
+            </select>
+            <div *ngIf="assignForm.get('userId')?.invalid && assignForm.get('userId')?.touched" class="admin-error-text">
+              <i class="bi bi-exclamation-circle me-1"></i>اختر مستخدماً
+            </div>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">الكورس *</label>
+            <select class="form-select admin-form-select" formControlName="courseId">
+              <option [value]="null">اختر كورس</option>
+              <option *ngFor="let c of courses" [value]="c.courseId">{{ c.courseName }}</option>
+            </select>
+            <div *ngIf="assignForm.get('courseId')?.invalid && assignForm.get('courseId')?.touched" class="admin-error-text">
+              <i class="bi bi-exclamation-circle me-1"></i>اختر كورساً
+            </div>
+          </div>
+          <div class="admin-card-footer">
+            <button class="admin-btn admin-btn-success" type="submit" [disabled]="assignForm.invalid || loading">
+              <i class="bi bi-check-circle"></i>
+              {{ loading ? 'جاري التعيين...' : 'تعيين' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add Video Card -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <i class="bi bi-camera-video-plus admin-card-header-icon"></i>
+        إضافة فيديو إلى كورس
+      </div>
+      <div class="admin-card-body">
+        <form [formGroup]="videoForm" (ngSubmit)="addVideo()">
+          <div class="admin-form-group">
+            <label class="admin-form-label">الكورس *</label>
+            <select class="form-select admin-form-select" formControlName="courseId">
+              <option [value]="null">اختر كورس</option>
+              <option *ngFor="let c of courses" [value]="c.courseId">{{ c.courseName }}</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">عنوان الفيديو *</label>
+            <input class="form-control admin-form-control" formControlName="videoTitle" placeholder="أدخل عنوان الفيديو" />
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">رابط الفيديو *</label>
+            <input class="form-control admin-form-control" formControlName="videoUrl" placeholder="https://..." />
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="admin-form-group">
+                <label class="admin-form-label">المدة (ثانية)</label>
+                <input class="form-control admin-form-control" type="number" formControlName="duration" placeholder="0" />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="admin-form-group">
+                <label class="admin-form-label">الترتيب</label>
+                <input class="form-control admin-form-control" type="number" formControlName="orderIndex" placeholder="1" />
+              </div>
+            </div>
+          </div>
+          <div class="admin-card-footer">
+            <button class="admin-btn admin-btn-secondary" type="submit" [disabled]="videoForm.invalid || loading">
+              <i class="bi bi-plus-circle"></i>
+              {{ loading ? 'جاري الإضافة...' : 'إضافة فيديو' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add Quiz Card -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <i class="bi bi-patch-plus admin-card-header-icon"></i>
+        إضافة كويز إلى كورس
+      </div>
+      <div class="admin-card-body">
+        <form [formGroup]="quizForm" (ngSubmit)="addQuiz()">
+          <div class="admin-form-group">
+            <label class="admin-form-label">الكورس *</label>
+            <select class="form-select admin-form-select" formControlName="courseId" (change)="onQuizCourseChange()">
+              <option [value]="null">اختر كورس</option>
+              <option *ngFor="let c of courses" [value]="c.courseId">{{ c.courseName }}</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">عنوان الكويز *</label>
+            <input class="form-control admin-form-control" formControlName="quizTitle" placeholder="أدخل عنوان الكويز" />
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">الوصف</label>
+            <textarea class="form-control admin-form-control" rows="2" formControlName="description" placeholder="أدخل وصف الكويز"></textarea>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <div class="admin-form-group">
+                <label class="admin-form-label">درجة النجاح (%)</label>
+                <input class="form-control admin-form-control" type="number" formControlName="passingScore" placeholder="50" />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="admin-form-group">
+                <label class="admin-form-label">الزمن (دقيقة)</label>
+                <input class="form-control admin-form-control" type="number" formControlName="timeLimit" placeholder="10" />
+              </div>
+            </div>
+          </div>
+          <div class="admin-form-check">
+            <input class="admin-form-check-input" type="checkbox" formControlName="isActive" id="quizActive" />
+            <label class="admin-form-check-label" for="quizActive">كويز نشط</label>
+          </div>
+          <div class="admin-card-footer">
+            <button class="admin-btn admin-btn-secondary" type="submit" [disabled]="quizForm.invalid || loading">
+              <i class="bi bi-plus-circle"></i>
+              {{ loading ? 'جاري الإضافة...' : 'إضافة كويز' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add Question Card -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <i class="bi bi-question-circle-plus admin-card-header-icon"></i>
+        إضافة سؤال لكويز
+      </div>
+      <div class="admin-card-body">
+        <form [formGroup]="questionForm" (ngSubmit)="addQuestion()">
+          <div class="admin-form-group">
+            <label class="admin-form-label">الكويز *</label>
+            <select class="form-select admin-form-select" formControlName="quizId" (change)="onQuestionQuizChange()">
+              <option [value]="null">اختر كويز</option>
+              <option *ngFor="let q of quizzesForCourse" [value]="q.quizId">{{ q.quizTitle }}</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">نص السؤال *</label>
+            <textarea class="form-control admin-form-control" formControlName="questionText" placeholder="أدخل نص السؤال"></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="admin-form-group">
+                <label class="admin-form-label">نوع السؤال *</label>
+                <select class="form-select admin-form-select" formControlName="questionType">
+                  <option [value]="0">اختيار</option>
+                  <option [value]="1">صح/خطأ</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="admin-form-group">
+                <label class="admin-form-label">الترتيب</label>
+                <input class="form-control admin-form-control" type="number" formControlName="orderIndex" placeholder="1" />
+              </div>
+            </div>
+          </div>
+          <div class="admin-card-footer">
+            <button class="admin-btn admin-btn-secondary" type="submit" [disabled]="questionForm.invalid || loading">
+              <i class="bi bi-plus-circle"></i>
+              {{ loading ? 'جاري الإضافة...' : 'إضافة سؤال' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add Answer Card -->
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <i class="bi bi-chat-left-dots-fill admin-card-header-icon"></i>
+        إضافة إجابة لسؤال
+      </div>
+      <div class="admin-card-body">
+        <form [formGroup]="answerForm" (ngSubmit)="addAnswer()">
+          <div class="admin-form-group">
+            <label class="admin-form-label">السؤال *</label>
+            <select class="form-select admin-form-select" formControlName="questionId">
+              <option [value]="null">اختر سؤال</option>
+              <option *ngFor="let qu of questionsForQuiz" [value]="qu.questionId">
+                {{ qu.orderIndex }}. {{ qu.questionText }}
+              </option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label class="admin-form-label">نص الإجابة *</label>
+            <textarea class="form-control admin-form-control" formControlName="answerText" placeholder="أدخل نص الإجابة"></textarea>
+          </div>
+          <div class="admin-form-check">
+            <input class="admin-form-check-input" type="checkbox" formControlName="isCorrect" id="answerCorrect" />
+            <label class="admin-form-check-label" for="answerCorrect">هذه الإجابة الصحيحة</label>
+          </div>
+          <div class="admin-card-footer">
+            <button class="admin-btn admin-btn-secondary" type="submit" [disabled]="answerForm.invalid || loading">
+              <i class="bi bi-plus-circle"></i>
+              {{ loading ? 'جاري الإضافة...' : 'إضافة إجابة' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div></div>

@@ -1,0 +1,107 @@
+<div *ngIf="course as c; else loading">
+  <div class="card p-3 border-0 shadow-sm">
+    <div class="d-flex align-items-center gap-3">
+      <img *ngIf="c.courseImage" [src]="c.courseImage" class="rounded" width="96" height="96" alt="" />
+      <div>
+        <h2 class="mb-2">{{ c.courseName }}</h2>
+        <p class="text-muted mb-2">{{ c.description }}</p>
+        <div class="d-flex align-items-center gap-3">
+          <span class="badge" [class.bg-success]="c.isFree" [class.bg-primary]="!c.isFree">{{ c.isFree ? 'مجاني' : 'مدفوع' }}</span>
+          <span *ngIf="!c.isFree" class="text-primary fw-semibold">{{ c.price | currency:'EGP':"symbol" }}</span>
+          <a *ngIf="!c.isFree && !canAccess" class="btn btn-outline-success btn-sm" [href]="whatsAppLink" target="_blank">حجز عبر واتساب</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="canAccess; else locked">
+    <h4 class="mt-4 section-title">الفيديوهات</h4>
+    <ul class="list-group mb-3">
+      <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let v of videos">
+        <div>
+          <div class="fw-semibold">{{ v.orderIndex }}. {{ v.videoTitle }}</div>
+          <small class="text-muted">مدة: {{ v.duration }} ثانية</small>
+        </div>
+        <a class="btn btn-sm btn-secondary" [routerLink]="['/videos', v.videoId]">مشاهدة</a>
+      </li>
+    </ul>
+
+    <h4 class="section-title mt-4">الكويزات</h4>
+    <div *ngIf="!quizzes.length" class="alert alert-info">
+      <i class="bi bi-info-circle me-2"></i>لا توجد كويزات متاحة حالياً.
+    </div>
+    <div class="row" *ngIf="quizzes.length">
+      <div class="col-md-6 mb-3" *ngFor="let q of quizzes">
+        <div class="quiz-card">
+          <div class="quiz-card-header">
+            <i class="bi bi-patch-question-fill"></i>
+          </div>
+          <div class="quiz-card-body">
+            <h5 class="quiz-card-title">{{ q.quizTitle }}</h5>
+            <p class="quiz-card-description">{{ q.description }}</p>
+            <div class="quiz-card-info">
+              <div class="info-item">
+                <i class="bi bi-question-circle"></i>
+                <span>{{ q.totalQuestions }} سؤال</span>
+              </div>
+              <div class="info-item">
+                <i class="bi bi-clock"></i>
+                <span>{{ q.timeLimit }} دقيقة</span>
+              </div>
+              <div class="info-item">
+                <i class="bi bi-trophy"></i>
+                <span>{{ q.passingScore }}% للنجاح</span>
+              </div>
+            </div>
+          </div>
+          <div class="quiz-card-footer">
+            <a class="btn btn-primary w-100" [routerLink]="['/quizzes', q.quizId]">
+              <i class="bi bi-play-circle me-2"></i>ابدأ الامتحان
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h4 class="section-title mt-5">سجل محاولاتك</h4>
+    <div *ngIf="attempts.length; else noAttempts" class="row">
+      <div class="col-md-6 col-lg-4 mb-3" *ngFor="let a of attempts">
+        <div class="attempt-card" [class.attempt-passed]="a.isPassed" [class.attempt-failed]="!a.isPassed">
+          <div class="attempt-badge">
+            <i class="bi" [class.bi-check-circle-fill]="a.isPassed" [class.bi-x-circle-fill]="!a.isPassed"></i>
+          </div>
+          <h5 class="attempt-quiz-title">{{ a.quizTitle || 'كويز' }}</h5>
+          <div class="attempt-score">{{ a.score }}%</div>
+          <div class="attempt-details">
+            <div class="detail-row">
+              <span class="text-success"><i class="bi bi-check-circle"></i> {{ a.correctAnswers }}</span>
+              <span class="text-danger"><i class="bi bi-x-circle"></i> {{ a.totalQuestions - a.correctAnswers }}</span>
+            </div>
+            <div class="detail-row mt-2">
+              <small class="text-muted">{{ a.completedAt | date:'short' }}</small>
+            </div>
+          </div>
+          <div class="attempt-footer">
+            <a class="btn btn-sm btn-outline-primary w-100" [routerLink]="['/quizzes', a.quizId]">
+              <i class="bi bi-arrow-clockwise me-1"></i>محاولة جديدة
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ng-template #noAttempts>
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>لم تقم بأي محاولات بعد. ابدأ أول امتحان الآن!
+      </div>
+    </ng-template>
+  </div>
+
+  <ng-template #locked>
+    <div class="alert alert-warning mt-4">
+      المحتوى غير متاح. إذا كان الكورس مدفوع يجب أن يضيفك الأدمن إلى هذا الكورس.
+    </div>
+  </ng-template>
+</div>
+<ng-template #loading>
+  <div class="text-center py-5">جاري التحميل...</div>
+</ng-template>

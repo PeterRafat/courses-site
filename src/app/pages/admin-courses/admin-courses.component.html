@@ -1,0 +1,202 @@
+<div class="admin-container">
+  <div class="admin-header">
+    <div class="admin-header-title">
+      <i class="bi bi-book admin-header-icon"></i> إدارة الكورسات
+    </div>
+  </div>
+
+  <div class="admin-nav-tabs">
+   
+    <a routerLink="/admin/courses" routerLinkActive="active" class="active">
+      <i class="bi bi-book"></i> الكورسات
+    </a>
+    <a routerLink="/admin/videos" routerLinkActive="active">
+      <i class="bi bi-camera-video"></i> الفيديوهات
+    </a>
+    <a routerLink="/admin/quizzes" routerLinkActive="active">
+      <i class="bi bi-patch-question"></i> الكويزات
+    </a>
+    <a routerLink="/admin/assign" routerLinkActive="active">
+      <i class="bi bi-person-plus"></i> تعيين كورس
+    </a>
+  </div>
+
+  <div *ngIf="errorMsg" class="admin-alert admin-alert-danger">
+    <i class="bi bi-exclamation-triangle admin-alert-icon"></i>
+    <div>{{ errorMsg }}</div>
+  </div>
+  <div *ngIf="successMsg" class="admin-alert admin-alert-success">
+    <i class="bi bi-check-circle admin-alert-icon"></i>
+    <div>{{ successMsg }}</div>
+  </div>
+
+  <div class="admin-card">
+    <div class="admin-card-header">
+      <i class="bi bi-plus-circle admin-card-header-icon"></i>
+      {{ editingCourseId ? 'تعديل كورس' : 'إضافة كورس جديد' }}
+    </div>
+    <div class="admin-card-body">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="admin-form-group mb-3">
+          <label class="admin-form-label">اسم الكورس</label>
+          <input class="admin-form-control" formControlName="courseName" placeholder="اسم الكورس" />
+        </div>
+
+        <div class="admin-form-group mb-3">
+          <label class="admin-form-label d-block">طريقة إضافة الصورة</label>
+          <div class="admin-form-check admin-form-check-inline admin-courses-radio-spacing">
+            <input class="admin-form-check-input" type="radio" name="courseImageSrc" [checked]="sourceType==='link'" (change)="setSource('link')" id="sourceLink" />
+            <label class="admin-form-check-label" for="sourceLink">رابط صورة</label>
+          </div>
+          <div class="admin-form-check admin-form-check-inline admin-courses-radio-spacing">
+            <input class="admin-form-check-input" type="radio" name="courseImageSrc" [checked]="sourceType==='file'" (change)="setSource('file')" id="sourceFile" />
+            <label class="admin-form-check-label" for="sourceFile">رفع من الجهاز</label>
+          </div>
+        </div>
+
+        <div *ngIf="sourceType==='link'" class="admin-form-group mb-3">
+          <label class="admin-form-label">صورة الكورس (رابط)</label>
+          <input class="admin-form-control" formControlName="courseImage" placeholder="https://example.com/image.jpg" />
+        </div>
+        <div *ngIf="sourceType==='file'" class="admin-form-group mb-3">
+          <label class="admin-form-label">صورة الكورس (ملف)</label>
+          <input class="admin-form-control" type="file" accept="image/*" (change)="onImageSelected($event)" id="courseImageFile" />
+          <div *ngIf="imageFile" class="mt-2 small text-muted">
+            <i class="bi bi-file-image"></i> {{ imageFile.name }}
+          </div>
+        </div>
+
+        <div class="admin-form-group mb-3">
+          <label class="admin-form-label">الوصف</label>
+          <textarea class="admin-form-control" rows="3" formControlName="description" placeholder="وصف الكورس"></textarea>
+        </div>
+
+        <div class="row admin-gap-3">
+          <div class="col-md-6">
+            <div class="admin-form-group mb-3">
+              <label class="admin-form-label">السعر</label>
+              <input class="admin-form-control" type="number" formControlName="price" placeholder="0" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="admin-form-group mb-3 admin-form-check">
+              <input class="admin-form-check-input" type="checkbox" formControlName="isFree" id="isFree" />
+              <label class="admin-form-check-label" for="isFree">مجاني</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-card-footer d-flex justify-content-end gap-2">
+          <button 
+            *ngIf="editingCourseId" 
+            type="button" 
+            class="admin-btn admin-btn-secondary" 
+            (click)="cancelEdit()"
+            [disabled]="loading">
+            <i class="bi bi-x-circle me-1"></i> إلغاء
+          </button>
+          <button class="admin-btn admin-btn-primary" type="submit" [disabled]="form.invalid || loading">
+            <i class="bi bi-save me-1"></i> 
+            {{ loading ? 'جاري الحفظ...' : (editingCourseId ? 'تحديث' : 'حفظ') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Courses Dashboard -->
+  <div class="admin-card mt-4">
+    <div class="admin-card-header">
+      <i class="bi bi-list admin-card-header-icon"></i>
+      جميع الكورسات ({{ courses.length }})
+    </div>
+    <div class="admin-card-body">
+      <div *ngIf="courses.length === 0" class="text-center py-5">
+        <i class="bi bi-book fs-1 text-muted"></i>
+        <p class="mt-3 text-muted">لا توجد كورسات متاحة حالياً</p>
+      </div>
+      
+      <div *ngIf="courses.length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>الصورة</th>
+              <th>اسم الكورس</th>
+              <th>الوصف</th>
+              <th>السعر</th>
+              <th>الحالة</th>
+              <th>الفيديوهات</th>
+              <th>الكويزات</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let course of courses">
+              <td>
+                <div class="admin-course-image-thumb">
+                  <ng-container *ngIf="course.courseImage; else noImage">
+                    <img 
+                      [src]="getImageUrl(course.courseImage)" 
+                      alt="{{ course.courseName }}"
+                      (error)="onImageError($event)"
+                      class="admin-course-image"
+                    />
+                    <span class="admin-course-image-type-indicator" [title]="isUploadedImage(course.courseImage) ? 'صورة مرفوعة' : 'رابط خارجي'">
+                      <i class="bi" [class.bi-cloud-upload]="isUploadedImage(course.courseImage)" [class.bi-link]="!isUploadedImage(course.courseImage)"></i>
+                    </span>
+                  </ng-container>
+                  <ng-template #noImage>
+                    <div class="admin-course-image-placeholder">
+                      <i class="bi bi-image"></i>
+                    </div>
+                  </ng-template>
+                </div>
+              </td>
+              <td>
+                <div class="fw-bold">{{ course.courseName }}</div>
+                <small class="text-muted">{{ course.courseId }}</small>
+              </td>
+              <td>
+                <div class="admin-text-truncate" [title]="course.description">
+                  {{ course.description || '-' }}
+                </div>
+              </td>
+              <td>
+                <span *ngIf="course.isFree" class="badge bg-success">مجاني</span>
+                <span *ngIf="!course.isFree" class="fw-bold">{{ course.price | currency:'EGP':'symbol' }}</span>
+              </td>
+              <td>
+                <span class="badge" [class.bg-primary]="!course.isFree" [class.bg-success]="course.isFree">
+                  {{ course.isFree ? 'مجاني' : 'مدفوع' }}
+                </span>
+              </td>
+              <td class="text-center">
+                <span class="badge bg-info">{{ course.videoCount !== undefined ? course.videoCount : 'ـ' }}</span>
+              </td>
+              <td class="text-center">
+                <span class="badge bg-warning">{{ course.quizCount !== undefined ? course.quizCount : 'ـ' }}</span>
+              </td>
+              <td>
+                <div class="d-flex gap-1">
+                  <button 
+                    class="admin-btn admin-btn-sm admin-btn-outline-primary" 
+                    (click)="editCourse(course)"
+                    title="تعديل">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button 
+                    class="admin-btn admin-btn-sm admin-btn-outline-danger" 
+                    (click)="deleteCourse(course.courseId)"
+                    [disabled]="loading"
+                    title="حذف">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

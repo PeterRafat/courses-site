@@ -1,0 +1,48 @@
+<div class="auth-page" dir="rtl">
+  <div class="auth-left">
+    <div class="auth-box">
+      <div class="auth-brand">
+        <img src="logo.png" alt="logo" class="auth-logo" onerror="this.style.display='none'" />
+        <div class="auth-title"></div>
+      </div>
+
+      <h2 class="auth-heading">تسجيل الدخول</h2>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+        <div class="form-group">
+          <label for="email">البريد الإلكتروني</label>
+          <input id="email" class="auth-input" type="email" formControlName="email" placeholder="أدخل بريدك الإلكتروني" />
+        </div>
+
+        <div class="form-group">
+          <label for="password">كلمة المرور</label>
+          <input id="password" class="auth-input" type="password" formControlName="password" placeholder="أدخل كلمة المرور" />
+        </div>
+
+        <div class="auth-actions">
+          <div>
+            <input type="checkbox" id="remember" /> 
+            <label for="remember">تذكرني</label>
+          </div>
+          <a class="auth-forgot" routerLink="/forgot">نسيت كلمة المرور؟</a>
+        </div>
+
+        <button class="auth-primary" type="submit" [disabled]="form.invalid || loading">
+          {{ loading ? 'جاري الدخول...' : 'دخول' }}
+        </button>
+      </form>
+
+      <div class="auth-bottom">
+        ليس لديك حساب؟ <a routerLink="/register">إنشاء حساب</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-hero">
+      <h1>Welcome to our community</h1>
+      <p>Personalized, updated daily, and beautifully presented. Sign in to access courses and platform features.</p>
+      <div class="hero-figure"><img src="../../../../office.png" alt="" width="200"></div>
+    </div>
+  </div>
+</div>

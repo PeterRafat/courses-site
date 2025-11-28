@@ -1,0 +1,49 @@
+<div class="container"><div class="admin-container">
+  <div class="admin-header">
+    <div class="admin-header-title">
+      <i class="bi bi-person-plus admin-header-icon"></i> تعيين كورس
+    </div>
+  </div>
+</div>
+
+  <div class="admin-nav-tabs">
+   
+    <a routerLink="/admin/courses" routerLinkActive="active">
+      <i class="bi bi-book"></i> الكورسات
+    </a>
+    <a routerLink="/admin/videos" routerLinkActive="active">
+      <i class="bi bi-camera-video"></i> الفيديوهات
+    </a>
+    <a routerLink="/admin/quizzes" routerLinkActive="active">
+      <i class="bi bi-patch-question"></i> الكويزات
+    </a>
+    <a routerLink="/admin/assign" routerLinkActive="active" class="active">
+      <i class="bi bi-person-plus"></i> تعيين كورس
+    </a>
+  </div>
+
+  <div class="admin-card">
+    <div class="admin-card-header">
+      <i class="bi bi-person-plus admin-card-header-icon"></i>
+      تعيين كورس لمستخدم
+    </div>
+    <div class="admin-card-body">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="admin-form-group mb-3">
+          <label class="admin-form-label">المستخدم *</label>
+          <select class="form-select admin-form-select" formControlName="userId">
+            <option *ngFor="let u of users" [value]="u.userId">{{ u.fullName }} - {{ u.email }}</option>
+          </select>
+        </div>
+        <div class="admin-form-group mb-3">
+          <label class="admin-form-label">الكورس *</label>
+          <select class="form-select admin-form-select" formControlName="courseId">
+            <option *ngFor="let c of courses" [value]="c.courseId">{{ c.courseName }}</option>
+          </select>
+        </div>
+        <div class="admin-card-footer d-flex justify-content-end">
+          <button class="admin-btn admin-btn-success" type="submit" [disabled]="form.invalid || loading">تعيين</button>
+        </div>
+      </form>
+    </div>
+  </div>

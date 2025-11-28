@@ -1,1 +1,279 @@
-/* You can add global styles to this file, and also import other style files */
+/* Import Admin Styles - Must be first */
+@import './app/styles/admin-common.css';
+
+:root {
+  --primary: #6c5ce7;
+  --primary-dark: #5a4bd6;
+  --navbar-height: 56px;
+  --footer-height: 72px;
+  --secondary: #00b894;
+  --accent: #fdcb6e;
+  --bg-soft: #f8f9fb;
+  --text-strong: #2d3436;
+  --text-muted: #636e72;
+}
+
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+body {
+  background-color: var(--bg-soft);
+  color: var(--text-strong);
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Slightly smaller base font for a denser, cleaner layout */
+html, body {
+  font-size: 14px;
+}
+
+/* For larger screens keep a top offset for content so the sticky navbar doesn't overlap it.
+   Footer is not fixed so we only need a small bottom padding. */
+@media (min-width: 768px) {
+  nav.navbar + .container {
+    padding-top: var(--navbar-height);
+    padding-bottom: 1rem;
+  }
+  .admin-container {
+    padding-bottom: 1rem;
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.navbar {
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  position: sticky;
+  top: 0;
+  z-index: 1060;
+  background: white;
+}
+.navbar .navbar-brand {
+  font-weight: 700;
+  color: var(--primary);
+  transition: all 0.3s ease;
+}
+.navbar .navbar-brand:hover {
+  transform: scale(1.05);
+}
+.navbar .nav-link {
+  transition: all 0.3s ease;
+  position: relative;
+}
+.navbar .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary);
+  transition: width 0.3s ease;
+}
+.navbar .nav-link.active::after,
+.navbar .nav-link:hover::after {
+  width: 100%;
+}
+.navbar .nav-link.active {
+  color: var(--primary) !important;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+.btn-primary:hover::before {
+  width: 300px;
+  height: 300px;
+}
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
+}
+.btn-secondary {
+  background-color: var(--secondary);
+  border-color: var(--secondary);
+  transition: all 0.3s ease;
+}
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 184, 148, 0.4);
+}
+.btn-outline-primary {
+  color: var(--primary);
+  border-color: var(--primary);
+  transition: all 0.3s ease;
+}
+.btn-outline-primary:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff;
+  animation: gradientShift 10s ease infinite;
+  background-size: 200% 200%;
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.hero-gradient .lead { color: #fff; opacity: 0.9; }
+.hero-gradient .btn { box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+
+.card {
+  transition: all 0.3s ease;
+  border: none;
+}
+.card:hover {
+  transform: translateY(-4px);
+}
+.card.course-card {
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card.course-card:hover {
+  box-shadow: 0 16px 48px rgba(0,0,0,0.12);
+}
+.course-card .badge {
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.section-title {
+  font-weight: 800;
+  color: var(--text-strong);
+  position: relative;
+  display: inline-block;
+}
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  right: 0;
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 2px;
+  animation: expandWidth 0.6s ease-out;
+}
+@keyframes expandWidth {
+  from { width: 0; }
+  to { width: 50px; }
+}
+.section-subtitle { color: var(--text-muted); }
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(108,92,231,0.1);
+  color: var(--primary);
+  transition: all 0.3s ease;
+}
+.feature-icon:hover {
+  transform: scale(1.1) rotate(5deg);
+  background: rgba(108,92,231,0.2);
+}
+
+.footer-dark {
+  background-color: #1e272e;
+  color: #dfe6e9;
+  transition: all 0.3s ease;
+}
+.footer-dark a {
+  color: #b2bec3;
+  transition: all 0.3s ease;
+}
+.footer-dark a:hover {
+  color: #fff;
+  transform: translateX(-3px);
+}
+
+/* Form animations */
+.form-control {
+  transition: all 0.3s ease;
+}
+.form-control:focus {
+  transform: scale(1.02);
+  box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.25);
+}
+
+/* List group animations */
+.list-group-item {
+  transition: all 0.3s ease;
+}
+.list-group-item:hover {
+  background-color: #f8f9fa;
+  transform: translateX(-5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Sticky-footer layout: make `app-root` a column flex container so the middle
+   container grows and footer stays at the bottom naturally. */
+html, body, app-root {
+  height: 100%;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Let the main content area grow so footer is pushed to bottom when needed */
+app-root > .container {
+  flex: 1 1 auto;
+}

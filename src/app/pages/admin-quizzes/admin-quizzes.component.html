@@ -1,0 +1,290 @@
+<div class="container"><div class="admin-container">
+  <!-- Header -->
+  <div class="admin-header">
+    <div class="admin-header-title">
+      <i class="bi bi-patch-question admin-header-icon"></i>
+      إدارة الكويزات
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="admin-nav-tabs">
+   
+    <a routerLink="/admin/courses" routerLinkActive="active">
+      <i class="bi bi-book"></i> الكورسات
+    </a>
+    <a routerLink="/admin/videos" routerLinkActive="active">
+      <i class="bi bi-camera-video"></i> الفيديوهات
+    </a>
+    <a routerLink="/admin/quizzes" routerLinkActive="active" class="active">
+      <i class="bi bi-patch-question"></i> الكويزات
+    </a>
+    <a routerLink="/admin/assign" routerLinkActive="active">
+      <i class="bi bi-person-plus"></i> تعيين كورس
+    </a>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="errorMsg" class="admin-alert admin-alert-danger">
+    <i class="bi bi-exclamation-triangle admin-alert-icon"></i>
+    <div>{{ errorMsg }}</div>
+  </div>
+  <div *ngIf="successMsg" class="admin-alert admin-alert-success">
+    <i class="bi bi-check-circle admin-alert-icon"></i>
+    <div>{{ successMsg }}</div>
+  </div>
+
+
+  <!-- Course Selection Card -->
+  <div class="admin-card admin-mb-4">
+    <div class="admin-card-header">
+      <i class="bi bi-filter admin-card-header-icon"></i>
+      اختر كورس لإدارة الكويزات
+    </div>
+    <div class="admin-card-body">
+      <div class="row align-items-end admin-gap-3">
+        <div class="col-md-8">
+          <div class="admin-form-group">
+            <label class="admin-form-label">الكورس</label>
+            <select class="form-select admin-form-select" [(ngModel)]="selectedCourseId" (change)="onCourseChange()" 
+                    [disabled]="!!(showForm && editingQuizId)">
+              <option [value]="null">اختر كورس</option>
+              <option *ngFor="let c of courses" [value]="c.courseId">{{ c.courseName }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <button type="button" class="admin-btn admin-btn-success w-100" (click)="showForm = !showForm; resetForm()"
+                  *ngIf="selectedCourseId && !editingQuizId" [disabled]="loading">
+            <i class="bi bi-plus-circle"></i>إضافة كويز جديد
+          </button>
+          <button type="button" class="admin-btn admin-btn-secondary w-100" (click)="cancelEdit()"
+                  *ngIf="editingQuizId" [disabled]="loading">
+            <i class="bi bi-x-circle"></i>إلغاء التعديل
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form for adding/editing quiz -->
+  <div *ngIf="showForm || editingQuizId" class="admin-card admin-mb-4">
+    <div class="admin-card-header">
+      <i class="bi bi-pencil-square admin-card-header-icon"></i>
+      {{ editingQuizId ? 'تعديل الكويز' : 'إضافة كويز جديد' }}
+    </div>
+    <div class="admin-card-body">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <!-- Quiz Info -->
+        <div class="row admin-gap-3">
+          <div class="col-md-6">
+            <div class="admin-form-group">
+              <label class="admin-form-label">عنوان الكويز *</label>
+              <input class="form-control admin-form-control" formControlName="quizTitle" placeholder="أدخل عنوان الكويز" />
+              <div *ngIf="form.get('quizTitle')?.invalid && form.get('quizTitle')?.touched" class="admin-error-text">
+                <i class="bi bi-exclamation-circle me-1"></i>العنوان مطلوب
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="admin-form-group">
+              <label class="admin-form-label">الوصف</label>
+              <input class="form-control admin-form-control" formControlName="description" placeholder="أدخل وصف الكويز" />
+            </div>
+          </div>
+        </div>
+
+        <div class="row admin-gap-3">
+          <div class="col-md-4">
+            <div class="admin-form-group">
+              <label class="admin-form-label">درجة النجاح (%) *</label>
+              <input class="form-control admin-form-control" type="number" formControlName="passingScore" min="0" max="100" placeholder="0-100" />
+              <div *ngIf="form.get('passingScore')?.invalid && form.get('passingScore')?.touched" class="admin-error-text">
+                <i class="bi bi-exclamation-circle me-1"></i>درجة النجاح مطلوبة (0-100)
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="admin-form-group">
+              <label class="admin-form-label">الوقت (دقائق) *</label>
+              <input class="form-control admin-form-control" type="number" formControlName="timeLimit" min="1" placeholder="الوقت بالدقائق" />
+              <div *ngIf="form.get('timeLimit')?.invalid && form.get('timeLimit')?.touched" class="admin-error-text">
+                <i class="bi bi-exclamation-circle me-1"></i>الوقت مطلوب (أكثر من 0)
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="admin-form-group">
+              <label class="admin-form-label">الحالة</label>
+              <select class="form-select admin-form-select" formControlName="isActive">
+                <option [value]="true">نشط</option>
+                <option [value]="false">غير نشط</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Questions Section -->
+        <div class="admin-mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">
+              <i class="bi bi-question-circle me-2"></i>الأسئلة
+            </h5>
+            <button type="button" class="admin-btn admin-btn-success admin-btn-sm" (click)="addQuestion()">
+              <i class="bi bi-plus-circle me-1"></i>إضافة سؤال
+            </button>
+          </div>
+
+          <div formArrayName="questions" class="admin-accordion">
+            <div *ngFor="let question of questions.controls; let qi = index" class="admin-accordion-item" [formGroupName]="qi">
+              <button class="admin-accordion-header" type="button" (click)="toggleAccordion($event)">
+                <span>
+                  <span class="admin-badge admin-badge-primary me-2">س{{ qi + 1 }}</span>
+                  {{ question.get('questionText')?.value || 'سؤال جديد' }}
+                </span>
+                <i class="bi bi-chevron-down admin-accordion-icon"></i>
+              </button>
+              <div class="admin-accordion-body">
+                <div class="admin-form-group">
+                  <label class="admin-form-label">نص السؤال *</label>
+                  <textarea class="form-control admin-form-control" formControlName="questionText" rows="2" placeholder="أدخل نص السؤال"></textarea>
+                  <div *ngIf="question.get('questionText')?.invalid && question.get('questionText')?.touched" class="admin-error-text">
+                    <i class="bi bi-exclamation-circle me-1"></i>نص السؤال مطلوب
+                  </div>
+                </div>
+
+                <div class="row admin-gap-3">
+                  <div class="col-md-6">
+                    <div class="admin-form-group">
+                      <label class="admin-form-label">نوع السؤال *</label>
+                      <select class="form-select admin-form-select" formControlName="questionType">
+                        <option [value]="0">اختيار</option>
+                        <option [value]="1">صح أو خطأ</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="admin-form-group">
+                      <label class="admin-form-label">ترتيب السؤال</label>
+                      <input class="form-control admin-form-control" type="number" formControlName="orderIndex" min="1" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Answers Section -->
+                <div class="admin-mb-4">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <strong>
+                      <i class="bi bi-chat-left-dots me-2"></i>الخيارات
+                    </strong>
+                    <button type="button" class="admin-btn admin-btn-success admin-btn-sm" (click)="addAnswer(qi)">
+                      <i class="bi bi-plus-circle me-1"></i>إضافة خيار
+                    </button>
+                  </div>
+
+                  <div formArrayName="answers" class="admin-list">
+                    <div *ngFor="let answer of getAnswers(qi).controls; let ai = index" 
+                         class="admin-list-item" [formGroupName]="ai">
+                      <div class="row align-items-center admin-gap-2">
+                        <div class="col-md-7">
+                          <input class="form-control admin-form-control" formControlName="answerText" placeholder="نص الخيار" />
+                          <div *ngIf="answer.get('answerText')?.invalid && answer.get('answerText')?.touched" class="admin-error-text">
+                            <i class="bi bi-exclamation-circle me-1"></i>نص الخيار مطلوب
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="admin-form-check">
+                            <input class="admin-form-check-input" type="checkbox" formControlName="isCorrect" id="correct{{qi}}{{ai}}" />
+                            <label class="admin-form-check-label" for="correct{{qi}}{{ai}}">صحيح</label>
+                          </div>
+                        </div>
+                        <div class="col-md-2">
+                          <div class="d-flex gap-2">
+                            <input class="form-control admin-form-control" type="number" formControlName="orderIndex" min="1" placeholder="ترتيب" />
+                            <button type="button" class="admin-btn admin-btn-danger admin-btn-sm" (click)="deleteAnswer(qi, ai)" 
+                                    [disabled]="getAnswers(qi).length <= 2">
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                  <button type="button" class="admin-btn admin-btn-danger admin-btn-sm" (click)="deleteQuestion(qi)">
+                    <i class="bi bi-trash me-1"></i>حذف السؤال
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-card-footer">
+          <button type="button" class="admin-btn admin-btn-secondary admin-btn-sm" (click)="cancelEdit()" [disabled]="loading">
+            <i class="bi bi-x-circle"></i>إلغاء
+          </button>
+          <button type="submit" class="admin-btn admin-btn-primary" [disabled]="loading || form.invalid">
+            <i class="bi bi-save"></i>
+            {{ loading ? 'جاري الحفظ...' : (editingQuizId ? 'تحديث الكويز' : 'حفظ الكويز') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Existing Quizzes -->
+  <div *ngIf="selectedCourseId" class="admin-card">
+    <div class="admin-card-header">
+      <i class="bi bi-list admin-card-header-icon"></i>
+      الكويزات الموجودة <span class="admin-badge admin-badge-primary ms-2">{{ quizzesForCourse.length }}</span>
+    </div>
+    <div class="admin-card-body">
+      <div *ngIf="!quizzesForCourse.length" class="admin-alert admin-alert-info">
+        <i class="bi bi-info-circle admin-alert-icon"></i>
+        <div>لا توجد كويزات لهذا الكورس حالياً</div>
+      </div>
+      
+      <div class="admin-grid" *ngIf="quizzesForCourse.length">
+        <div *ngFor="let q of quizzesForCourse; let i = index" class="admin-card">
+          <div class="admin-card-header">
+            <div class="d-flex justify-content-between align-items-center w-100">
+              <span class="text-truncate">{{ q.quizTitle }}</span>
+              <span class="admin-badge" [class.admin-badge-success]="q.isActive" [class.admin-badge-warning]="!q.isActive">
+                {{ q.isActive ? 'نشط' : 'معطل' }}
+              </span>
+            </div>
+          </div>
+          <div class="admin-card-body">
+            <p class="admin-text-muted mb-3">{{ q.description || 'بدون وصف' }}</p>
+            
+            <div class="admin-list-item-meta mb-3">
+              <span>
+                <i class="bi bi-question-circle text-primary"></i>
+                {{ q.totalQuestions }} أسئلة
+              </span>
+              <span>
+                <i class="bi bi-clock text-warning"></i>
+                {{ q.timeLimit }} دقيقة
+              </span>
+              <span>
+                <i class="bi bi-trophy text-success"></i>
+                {{ q.passingScore }}% للنجاح
+              </span>
+            </div>
+          </div>
+          <div class="admin-card-footer">
+            <button class="admin-btn admin-btn-outline admin-btn-sm flex-fill" (click)="editQuiz(q)" [disabled]="loading || editingQuizId">
+              <i class="bi bi-pencil"></i> تعديل
+            </button>
+            <button class="admin-btn admin-btn-danger admin-btn-sm flex-fill" (click)="deleteQuiz(q.quizId)" [disabled]="loading">
+              <i class="bi bi-trash"></i> حذف
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>

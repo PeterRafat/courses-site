@@ -1,0 +1,74 @@
+<div class="auth-page" dir="rtl">
+  <div class="auth-left">
+    <div class="auth-box">
+      <div class="auth-brand">
+        <img src="logo.png" alt="logo" class="auth-logo" onerror="this.style.display='none'" />
+      </div>
+
+      <h2 class="auth-heading">إنشاء حساب</h2>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+        <div class="form-group">
+          <label for="fullName">الاسم الكامل</label>
+          <input id="fullName" class="auth-input" formControlName="fullName" placeholder="أدخل اسمك الكامل" />
+          <div *ngIf="form.get('fullName')?.invalid && form.get('fullName')?.touched" class="error-message">
+            الاسم الكامل مطلوب
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">الهاتف</label>
+          <input id="phone" class="auth-input" formControlName="phone" placeholder="أدخل رقم هاتفك" />
+          <div *ngIf="form.get('phone')?.invalid && form.get('phone')?.touched" class="error-message">
+            رقم الهاتف مطلوب
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">البريد الإلكتروني</label>
+          <input id="email" class="auth-input" type="email" formControlName="email" placeholder="أدخل بريدك الإلكتروني" />
+          <div *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="error-message">
+            البريد الإلكتروني مطلوب وصحيح
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">كلمة المرور</label>
+          <input id="password" class="auth-input" type="password" formControlName="password" placeholder="أدخل كلمة مرور قوية" />
+          <div *ngIf="form.get('password')?.invalid && form.get('password')?.touched" class="error-message">
+            كلمة المرور مطلوبة (على الأقل 6 أحرف)
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirm">تأكيد كلمة المرور</label>
+          <input id="confirm" class="auth-input" type="password" formControlName="confirm" placeholder="أعد إدخال كلمة المرور" />
+          <div *ngIf="form.get('confirm')?.invalid && form.get('confirm')?.touched" class="error-message">
+            تأكيد كلمة المرور مطلوب
+          </div>
+          <div *ngIf="form.errors?.['passwordMismatch'] && form.get('confirm')?.touched" class="error-message">
+            كلمات المرور غير متطابقة
+          </div>
+        </div>
+
+        <div class="auth-actions">
+          <button class="auth-primary" type="submit" [disabled]="form.invalid || loading">
+            {{ loading ? 'جاري التسجيل...' : 'تسجيل' }}
+          </button>
+        </div>
+        
+        <div class="auth-bottom">
+          لديك حساب بالفعل؟ <a routerLink="/login">تسجيل الدخول</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-hero">
+      <h1>Join our platform</h1>
+      <p>Sign up to get full access to courses, quizzes and learning paths. Fast, secure and community-driven.</p>
+      <div class="hero-figure"><img src="../../../../sign-up-form.jpg" alt="" width="250"></div>
+    </div>
+  </div>
+</div>

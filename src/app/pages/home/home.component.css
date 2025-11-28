@@ -1,0 +1,25 @@
+.lead{max-width:720px}
+.hero-gradient{position:relative;overflow:hidden}
+.hero-gradient::after{content:"";position:absolute;inset:auto -20% -30% -20%;height:200px;background:radial-gradient(closest-side, rgba(255,255,255,0.35), rgba(255,255,255,0));filter:blur(20px)}
+.card:hover{transform:translateY(-3px);transition:transform .2s ease}
+.feature-icon{box-shadow:0 6px 18px rgba(108,92,231,.15)}
+
+.banner-card{position:relative;overflow:hidden;min-height:180px}
+.banner-card::before{content:"";position:absolute;right:-20px;bottom:-20px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.15)}
+.banner-plus{background:linear-gradient(135deg,#6c5ce7,#00b894)}
+.banner-business{background:linear-gradient(135deg,#1e3799,#0c2461)}
+
+.testimonial-card{background:#fff;border:1px solid rgba(0,0,0,0.06);box-shadow:0 8px 24px rgba(0,0,0,0.06)}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6c5ce7,#fdcb6e)}
+
+.message-card{position:relative;background:linear-gradient(135deg, var(--primary), #8e44ad);color:#fff;box-shadow:0 15px 30px rgba(0,0,0,.12)}
+.message-card::before{content:"";position:absolute;left:-30px;top:-30px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.12)}
+.message-card::after{content:"";position:absolute;right:-40px;bottom:-40px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.1)}
+.message-text{font-size:1.05rem;opacity:.95}
+.highlight{background:rgba(253,203,110,.25);padding:.1rem .35rem;border-radius:.35rem}
+.check-list{list-style:none;padding:0;margin:0}
+.check-list li{position:relative;padding-inline-start:1.6rem;margin-bottom:.5rem}
+.check-list li::before{content:"✓";position:absolute;left:.3rem;top:.02rem;background:rgba(255,255,255,.25);color:#fff;width:1.1rem;height:1.1rem;display:inline-flex;align-items:center;justify-content:center;border-radius:50%}
+.stamp{background:#fff;color:var(--primary);font-weight:700;padding:.25rem .6rem;border-radius:999px;box-shadow:0 6px 14px rgba(0,0,0,.08)}
+.visual{min-height:180px;position:relative}
+.visual-shape{position:absolute;inset:0;background:radial-gradient(closest-side, rgba(255,255,255,.35), rgba(255,255,255,0));border-radius:24px}

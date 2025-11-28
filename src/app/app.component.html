@@ -177,7 +177,7 @@
   }
 </style>
 
-<main class="main">
+<main class="d-none">
   <div class="content">
     <div class="left-side">
       <svg
@@ -253,7 +253,7 @@
               fill="currentColor"
             >
               <path
-                d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z"
+                d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h280v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z"
               />
             </svg>
           </a>
@@ -333,4 +333,29 @@
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
 
-<router-outlet />
+<nav class="navbar navbar-expand-lg bg-white border-bottom">
+  <div class="container">
+    <a class="navbar-brand" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <img src="logo.png" alt="Logo" width="80" height="60" class="d-inline-block align-text-top">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item" *ngIf="isLoggedIn()"><a class="nav-link" routerLink="/courses" routerLinkActive="active">الكورسات</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="/about" routerLinkActive="active">عن المنصة</a></li>
+      </ul>
+      <div class="d-flex gap-2">
+        <a *ngIf="!isLoggedIn()" class="btn btn-outline-primary" routerLink="/login" routerLinkActive="active">تسجيل دخول</a>
+        <a *ngIf="!isLoggedIn()" class="btn btn-primary" routerLink="/register" routerLinkActive="active">إنشاء حساب</a>
+        <a *ngIf="isAdmin()" class="btn btn-warning" routerLink="/admin/courses" routerLinkActive="active">لوحة الأدمن</a>
+        <button *ngIf="isLoggedIn()" class="btn btn-outline-danger" (click)="logout()">تسجيل خروج</button>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="container my-4">
+  <router-outlet></router-outlet>
+</div>
+<app-footer></app-footer>

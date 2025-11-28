@@ -1,0 +1,22 @@
+<div class="container py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">جميع الكورسات</h2>
+    <a routerLink="/courses" class="btn btn-outline-primary">تحديث</a>
+  </div>
+  <div class="row g-3" [@fadeInUp]>
+    <div class="col-md-4" *ngFor="let c of courses">
+      <div class="card h-100 course-card">
+        <img *ngIf="c.courseImage" [src]="c.courseImage" class="card-img-top" alt="" (error)="onImageError($event)" />
+        <div class="card-body">
+          <h5 class="card-title">{{ c.courseName }}</h5>
+          <p class="card-text text-muted">{{ c.description }}</p>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+          <span class="badge" [class.bg-success]="c.isFree" [class.bg-primary]="!c.isFree">{{ c.isFree ? 'مجاني' : 'مدفوع' }}</span>
+          <span *ngIf="!c.isFree && accessible.has(c.courseId)" class="badge bg-success">لديك وصول</span>
+          <a class="btn btn-primary btn-sm" [routerLink]="['/courses', c.courseId]">تفاصيل</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
