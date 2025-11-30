@@ -1,12 +1,9 @@
-<div class="admin-container">
+<div class="container"><div class="admin-container">
   <div class="admin-header">
-    <div class="admin-header-title">
-      <i class="bi bi-book admin-header-icon"></i> إدارة الكورسات
-    </div>
+    <div class="admin-header-title"><i class="bi bi-book admin-header-icon"></i> إدارة الكورسات</div>
   </div>
 
   <div class="admin-nav-tabs">
-   
     <a routerLink="/admin/courses" routerLinkActive="active" class="active">
       <i class="bi bi-book"></i> الكورسات
     </a>
@@ -36,21 +33,30 @@
       {{ editingCourseId ? 'تعديل كورس' : 'إضافة كورس جديد' }}
     </div>
     <div class="admin-card-body">
+      <div *ngIf="deleteBlockedMsg" class="admin-alert admin-alert-warning w-100">
+        <i class="bi bi-exclamation-triangle admin-alert-icon"></i>
+        <span class="flex-grow-1">{{ deleteBlockedMsg }}</span>
+        <div class="d-flex gap-2">
+          <a class="admin-btn admin-btn-outline" [routerLink]="['/admin/assign']" [queryParams]="{ courseId: lastFailedCourseId }">
+            <i class="bi bi-people"></i> إدارة التسجيلات
+          </a>
+        </div>
+      </div>
       <form [formGroup]="form" (ngSubmit)="submit()">
         <div class="admin-form-group mb-3">
-          <label class="admin-form-label">اسم الكورس</label>
-          <input class="admin-form-control" formControlName="courseName" placeholder="اسم الكورس" />
+          <label class="admin-form-label">اسم الكورس *</label>
+          <input class="admin-form-control" formControlName="courseName" placeholder="أدخل اسم الكورس" />
         </div>
 
         <div class="admin-form-group mb-3">
           <label class="admin-form-label d-block">طريقة إضافة الصورة</label>
-          <div class="admin-form-check admin-form-check-inline admin-courses-radio-spacing">
+          <div class="admin-form-check admin-courses-form-check-inline">
             <input class="admin-form-check-input" type="radio" name="courseImageSrc" [checked]="sourceType==='link'" (change)="setSource('link')" id="sourceLink" />
-            <label class="admin-form-check-label" for="sourceLink">رابط صورة</label>
+            <label class="admin-form-check-label admin-courses-form-check-label" for="sourceLink">رابط صورة</label>
           </div>
-          <div class="admin-form-check admin-form-check-inline admin-courses-radio-spacing">
+          <div class="admin-form-check admin-courses-form-check-inline">
             <input class="admin-form-check-input" type="radio" name="courseImageSrc" [checked]="sourceType==='file'" (change)="setSource('file')" id="sourceFile" />
-            <label class="admin-form-check-label" for="sourceFile">رفع من الجهاز</label>
+            <label class="admin-form-check-label admin-courses-form-check-label" for="sourceFile">رفع من الجهاز</label>
           </div>
         </div>
 
@@ -60,7 +66,7 @@
         </div>
         <div *ngIf="sourceType==='file'" class="admin-form-group mb-3">
           <label class="admin-form-label">صورة الكورس (ملف)</label>
-          <input class="admin-form-control" type="file" accept="image/*" (change)="onImageSelected($event)" id="courseImageFile" />
+          <input class="admin-form-control" type="file" accept=".jpg,.jpeg,.png,.gif,.webp" (change)="onImageSelected($event)" id="courseImageFile" />
           <div *ngIf="imageFile" class="mt-2 small text-muted">
             <i class="bi bi-file-image"></i> {{ imageFile.name }}
           </div>
@@ -93,10 +99,10 @@
             class="admin-btn admin-btn-secondary" 
             (click)="cancelEdit()"
             [disabled]="loading">
-            <i class="bi bi-x-circle me-1"></i> إلغاء
+            <i class="bi bi-x-circle"></i> إلغاء
           </button>
           <button class="admin-btn admin-btn-primary" type="submit" [disabled]="form.invalid || loading">
-            <i class="bi bi-save me-1"></i> 
+            <i class="bi bi-save"></i> 
             {{ loading ? 'جاري الحفظ...' : (editingCourseId ? 'تحديث' : 'حفظ') }}
           </button>
         </div>
@@ -184,6 +190,7 @@
                     title="تعديل">
                     <i class="bi bi-pencil"></i>
                   </button>
+                  
                   <button 
                     class="admin-btn admin-btn-sm admin-btn-outline-danger" 
                     (click)="deleteCourse(course.courseId)"
@@ -199,4 +206,4 @@
       </div>
     </div>
   </div>
-</div>
+</div></div>

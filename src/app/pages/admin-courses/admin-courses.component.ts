@@ -247,13 +247,43 @@ export class AdminCoursesComponent implements OnInit {
     });
   }
 
+  deactivateCourse(courseId: number) {
+    if (!confirm('إلغاء تفعيل هذا الكورس؟ سيظل موجودًا بدون إمكانية الوصول.')) return;
+    this.loading = true;
+    this.admin.deactivateCourse(courseId).subscribe({
+      next: () => {
+        this.loading = false;
+        this.success('تم إلغاء تفعيل الكورس');
+        this.toastr.success('تم إلغاء تفعيل الكورس بنجاح');
+        this.loadCoursesWithCounts();
+        this.deleteBlockedMsg = null;
+        this.lastFailedCourseId = null;
+      },
+      error: (err: any) => {
+        this.loading = false;
+        this.setError(err);
+        this.toastr.error(this.errorHandler.getErrorMessage(err), 'فشل إلغاء التفعيل');
+      }
+    });
+  }
+
   setSource(type: 'link' | 'file') { 
     this.sourceType = type; 
   }
   
   onImageSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    this.imageFile = (input.files && input.files[0]) ? input.files[0] : null;
+    const file = (input.files && input.files[0]) ? input.files[0] : null;
+    if (!file) { this.imageFile = null; return; }
+    const allowed = ['image/jpeg','image/png','image/gif','image/webp'];
+    if (!allowed.includes(file.type)) {
+      this.imageFile = null;
+      this.setError({ message: 'نوع الصورة غير صالح. الأنواع المسموح بها: .jpg, .jpeg, .png, .gif, .webp' });
+      this.toastr.error('نوع الصورة غير صالح. الأنواع المسموح بها: .jpg, .jpeg, .png, .gif, .webp');
+      (event.target as HTMLInputElement).value = '';
+      return;
+    }
+    this.imageFile = file;
   }
 
   onImageError(event: Event) {

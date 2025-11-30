@@ -28,9 +28,11 @@ export class LoginComponent {
 
   submit() {
     if (this.form.invalid) return;
+    console.log('Submitting login form:', this.form.value);
     this.loading = true;
     this.auth.login(this.form.value as any).subscribe({
       next: (res) => {
+        console.log('Login successful:', res);
         this.loading = false;
         this.toastr.success('تم تسجيل الدخول بنجاح');
         const role = res?.user?.role?.toLowerCase();
@@ -41,10 +43,12 @@ export class LoginComponent {
         }
       },
       error: (err) => {
+        console.log('Login failed:', err);
         this.loading = false;
+        console.error('Login component error:', err);
         const msg = this.errHandler.getErrorMessage(err);
         this.toastr.error(msg);
-        this.router.navigateByUrl('/login');
+        // Don't redirect to login on login error as we're already on the login page
       }
     });
   }

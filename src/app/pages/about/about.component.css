@@ -1,1 +1,40 @@
-.container{max-width:960px}
+.about-wrapper{background:#f8f9fb}
+.about-hero{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:4rem 0;position:relative;overflow:hidden}
+.hero-content{max-width:560px}
+.hero-badge{display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);padding:.35rem .75rem;border-radius:999px;margin-bottom:1rem;font-weight:600}
+.hero-title{font-size:2.25rem;font-weight:800;margin-bottom:.75rem}
+.hero-subtitle{font-size:1.1rem;opacity:.95;margin-bottom:1.25rem}
+.hero-actions{display:flex;gap:.75rem}
+.hero-image{position:relative}
+.hero-image img{width:100%;max-width:520px;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.image-decoration{position:absolute;inset:-20px;border-radius:24px;background:radial-gradient(120px 120px at 80% 20%,rgba(255,255,255,.35),transparent),radial-gradient(140px 140px at 20% 80%,rgba(255,255,255,.25),transparent)}
+
+.about-features{padding:3rem 0}
+.feature-card{background:#fff;border-radius:16px;padding:1.25rem;box-shadow:0 10px 30px rgba(0,0,0,.08);transition:transform .25s ease,box-shadow .25s ease;height:100%}
+.feature-card:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.12)}
+.feature-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;margin-bottom:.75rem}
+.feature-icon i{font-size:1.25rem}
+.feature-title{font-weight:700;margin-bottom:.5rem}
+.feature-text{color:#6b7280}
+
+.about-highlights{padding:3rem 0}
+.highlight-card{background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.1);height:100%;display:flex}
+.highlight-content{padding:2rem}
+.highlight-title{font-weight:800;margin-bottom:.5rem}
+.highlight-text{color:#4b5563;margin-bottom:1rem}
+.stats{display:flex;gap:1.5rem;flex-wrap:wrap}
+.stat{background:#f3f4f6;border-radius:12px;padding:1rem 1.25rem;min-width:140px}
+.stat-number{font-size:1.5rem;font-weight:800;color:#667eea}
+.stat-label{color:#6b7280}
+
+.side-card{background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.1);overflow:hidden;height:100%;display:flex;flex-direction:column}
+.side-card img{width:100%;height:180px;object-fit:cover}
+.side-card-body{padding:1.25rem}
+.side-title{font-weight:700;margin-bottom:.25rem}
+.side-text{color:#6b7280;margin-bottom:1rem}
+
+@media (max-width:768px){
+  .hero-title{font-size:1.75rem}
+  .hero-subtitle{font-size:1rem}
+  .hero-actions{flex-direction:column}
+}

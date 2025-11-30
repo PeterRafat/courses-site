@@ -30,7 +30,7 @@ export class AdminVideosComponent {
       courseId: [null, Validators.required],
       videoTitle: ['', Validators.required],
       videoUrl: [''],
-      duration: [0, [Validators.required, Validators.min(0)]],
+      duration: [1, [Validators.required, Validators.min(1)]],
       orderIndex: [1, [Validators.required, Validators.min(1)]]
     });
     this.coursesSvc.getCourses().subscribe({ next: c => this.courses = c, error: err => this.setError(err) });
@@ -47,16 +47,27 @@ export class AdminVideosComponent {
     }
     if (this.form.invalid) return;
     const { courseId, videoTitle, videoUrl, duration, orderIndex } = this.form.value as any;
+    if (Number(duration) <= 0) { this.setError({ message: 'مدة الفيديو يجب أن تكون أكبر من 0' }); return; }
     this.loading = true;
     if (linkMode) {
       this.admin.addVideo(courseId, { videoTitle, videoUrl, duration, orderIndex }).subscribe({
-        next: () => { this.loading = false; this.success('تم إضافة الفيديو'); this.resetForm(); },
+        next: (created) => { 
+          this.loading = false; 
+          this.success('تم إضافة الفيديو'); 
+          this.refreshVideos(courseId);
+          this.resetForm(); 
+        },
         error: err => this.setError(err)
       });
     } else {
       if (!this.videoFile) { this.setError({ message: 'يجب اختيار ملف فيديو' }); return; }
       this.admin.uploadVideo({ courseId, videoTitle, duration, orderIndex }, this.videoFile).subscribe({
-        next: () => { this.loading = false; this.success('تم رفع الفيديو'); this.resetForm(); },
+        next: (created) => { 
+          this.loading = false; 
+          this.success('تم رفع الفيديو'); 
+          this.refreshVideos(courseId);
+          this.resetForm(); 
+        },
         error: err => this.setError(err)
       });
     }
@@ -74,6 +85,18 @@ export class AdminVideosComponent {
     this.admin.getVideosByCourse(cid).subscribe({
       next: (list) => {
         this.videos = list.map(v => ({ id: v.videoId, title: v.videoTitle, url: v.videoUrl, duration: v.duration, orderIndex: v.orderIndex }));
+      },
+      error: (err) => this.setError(err)
+    });
+  }
+
+  private refreshVideos(courseId: number) {
+    if (!courseId) return;
+    this.admin.getVideosByCourse(courseId).subscribe({
+      next: (list) => {
+        if (this.selectedCourseId === courseId) {
+          this.videos = list.map(v => ({ id: v.videoId, title: v.videoTitle, url: v.videoUrl, duration: v.duration, orderIndex: v.orderIndex }));
+        }
       },
       error: (err) => this.setError(err)
     });
@@ -126,7 +149,7 @@ export class AdminVideosComponent {
   }
 
   private resetForm() {
-    this.form.reset({ duration: 0, orderIndex: 1 });
+    this.form.reset({ duration: 1, orderIndex: 1 });
     this.videoFile = null;
     this.sourceType = 'link';
   }

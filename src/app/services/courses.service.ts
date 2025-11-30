@@ -4,7 +4,6 @@ import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Course, CourseVideo, Quiz } from '../models/entities';
 import { formatCourseImageUrl, formatVideoUrl } from '../utils/image-url.util';
-import { USE_MOCK, mockCourses, mockVideos, mockQuizzes } from '../mock/mock-data';
 import { environment } from '../../environments/environment';
 import { ErrorHandlerService } from '../core/error-handler.service';
 
@@ -15,7 +14,6 @@ export class CoursesService {
   constructor(private http: HttpClient, private errorHandler: ErrorHandlerService) {}
 
   getCourses(): Observable<Course[]> {
-    if (USE_MOCK) return of(mockCourses);
     return this.http.get<{ success: boolean; message: string; data: any[]; errors: string[] }>(`${this.baseUrl}/Courses`).pipe(
       map(res => (res?.data ?? []).map(item => ({
         courseId: item.id,
@@ -32,7 +30,6 @@ export class CoursesService {
   }
 
   getCourse(courseId: number): Observable<Course> {
-    if (USE_MOCK) return of(mockCourses.find(c => c.courseId === courseId)!);
     return this.http.get<{ success: boolean; message: string; data: any; errors: string[] }>(`${this.baseUrl}/Courses/${courseId}`).pipe(
       map(res => ({
         courseId: res?.data?.id ?? courseId,
@@ -58,7 +55,6 @@ export class CoursesService {
   }
 
   getCourseVideos(courseId: number): Observable<CourseVideo[]> {
-    if (USE_MOCK) return of(mockVideos.filter(v => v.courseId === courseId));
     return this.http
       .get<{ success: boolean; message: string; data: any[]; errors: string[] }>(`${this.baseUrl}/Courses/${courseId}/videos`)
       .pipe(
@@ -75,7 +71,6 @@ export class CoursesService {
   }
 
   getCourseQuizzes(courseId: number): Observable<Quiz[]> {
-    if (USE_MOCK) return of(mockQuizzes.filter(q => q.courseId === courseId));
     // Note: Backend should provide /api/Quizzes/courses/{courseId} endpoint
     // For now, using admin endpoint - may fail with 403 for non-admin users
     return this.http
@@ -100,7 +95,6 @@ export class CoursesService {
   }
 
   getVideo(videoId: number): Observable<CourseVideo> {
-    if (USE_MOCK) return of(mockVideos.find(v => v.videoId === videoId)!);
     console.log('Fetching video from API:', `${this.baseUrl}/Videos/${videoId}`);
     return this.http
       .get<{ success: boolean; message: string; data: any; errors: string[] }>(`${this.baseUrl}/Videos/${videoId}`)

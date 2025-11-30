@@ -9,10 +9,20 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
   
-  // Clone the request and add the authorization header if token exists
-  if (token) {
-    req = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
+  // Add common headers for API requests
+  let headers: { [key: string]: string } = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
+  
+  // Add authorization header if token exists and it's not a login/register request
+  if (token && !req.url.includes('/Auth/login') && !req.url.includes('/Auth/register')) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
+  
+  req = req.clone({
+    setHeaders: headers
+  });
   
   return next(req).pipe(
     catchError((error) => {

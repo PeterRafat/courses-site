@@ -1,6 +1,6 @@
 // Production environment configuration
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://your-production-domain.com/api',
-  videoBaseUrl: 'https://your-production-domain.com'
+  apiBaseUrl: 'https://localhost:7000/api',
+  videoBaseUrl: 'https://localhost:7000'
 };

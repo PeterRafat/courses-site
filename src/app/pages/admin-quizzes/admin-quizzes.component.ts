@@ -105,6 +105,12 @@ export class AdminQuizzesComponent {
 
   addAnswer(questionIndex: number) {
     const answers = this.getAnswers(questionIndex);
+    const qg = this.questions.at(questionIndex) as FormGroup;
+    const type = Number(qg.get('questionType')?.value);
+    if (type === 1 && answers.length >= 2) {
+      this.toastr.warning('سؤال صح/خطأ يحتوي على خيارين فقط');
+      return;
+    }
     const answer = this.createAnswer();
     answer.get('orderIndex')?.setValue(answers.length + 1);
     answers.push(answer);
@@ -236,16 +242,7 @@ export class AdminQuizzesComponent {
         passingScore: formValue.passingScore,
         timeLimit: formValue.timeLimit,
         isActive: formValue.isActive,
-        questions: (formValue.questions || []).map((q: any) => ({
-          questionText: q.questionText,
-          questionType: q.questionType,
-          orderIndex: q.orderIndex,
-          answers: (q.answers || []).map((a: any) => ({
-            answerText: a.answerText,
-            isCorrect: !!a.isCorrect,
-            orderIndex: a.orderIndex
-          }))
-        }))
+        questions: (formValue.questions || []).map((q: any) => this.normalizeQuestionPayload(q))
       };
       console.log('Updating quiz payload:', updatePayload);
       this.admin.updateQuiz(this.editingQuizId, updatePayload).subscribe({
@@ -308,16 +305,7 @@ export class AdminQuizzesComponent {
     }
 
     const q = questions[index];
-    const questionPayload = {
-      questionText: q.questionText,
-      questionType: q.questionType,
-      orderIndex: q.orderIndex,
-      answers: (q.answers || []).map((a: any) => ({
-        answerText: a.answerText,
-        isCorrect: !!a.isCorrect,
-        orderIndex: a.orderIndex
-      }))
-    };
+    const questionPayload = this.normalizeQuestionPayload(q);
 
     console.log(`Creating question ${index + 1}/${questions.length} for quiz ${quizId}:`, questionPayload);
     this.admin.addQuestion(quizId, questionPayload).subscribe({
@@ -333,6 +321,71 @@ export class AdminQuizzesComponent {
         this.toastr.error(`فشل إضافة السؤال ${index + 1}`);
       }
     });
+  }
+
+  onQuestionTypeChange(index: number) {
+    const qg = this.questions.at(index) as FormGroup;
+    const type = Number(qg.get('questionType')?.value);
+    if (type === 1) {
+      const answers = qg.get('answers') as FormArray;
+      while (answers.length > 2) {
+        answers.removeAt(answers.length - 1);
+      }
+      if (answers.length < 2) {
+        while (answers.length < 2) answers.push(this.createAnswer());
+      }
+      const a0 = answers.at(0) as FormGroup;
+      const a1 = answers.at(1) as FormGroup;
+      a0.get('answerText')?.setValue(a0.get('answerText')?.value || 'true');
+      a1.get('answerText')?.setValue(a1.get('answerText')?.value || 'false');
+      const hasTrue = !!a0.get('isCorrect')?.value || !!a1.get('isCorrect')?.value;
+      if (!hasTrue) a0.get('isCorrect')?.setValue(true);
+      if (!!a0.get('isCorrect')?.value && !!a1.get('isCorrect')?.value) a1.get('isCorrect')?.setValue(false);
+      a0.get('orderIndex')?.setValue(0);
+      a1.get('orderIndex')?.setValue(1);
+    }
+  }
+
+  onToggleCorrectTF(questionIndex: number, answerIndex: number) {
+    const qg = this.questions.at(questionIndex) as FormGroup;
+    const type = Number(qg.get('questionType')?.value);
+    if (type !== 1) return;
+    const answers = qg.get('answers') as FormArray;
+    answers.controls.forEach((ctrl, i) => {
+      if (i !== answerIndex) (ctrl as FormGroup).get('isCorrect')?.setValue(false, { emitEvent: false });
+    });
+  }
+
+  private normalizeQuestionPayload(q: any) {
+    const type = Number(q.questionType);
+    let answers = (q.answers || []).map((a: any, i: number) => ({
+      answerText: a.answerText,
+      isCorrect: !!a.isCorrect,
+      orderIndex: a.orderIndex ?? i + 1
+    }));
+    if (type === 1) {
+      answers = answers.slice(0, 2);
+      while (answers.length < 2) {
+        answers.push({ answerText: answers.length === 0 ? 'true' : 'false', isCorrect: answers.length === 0, orderIndex: answers.length });
+      }
+      const firstTrueIndex = answers.findIndex((a: any) => a.isCorrect);
+      answers = answers.map((a: any, i: number) => ({ ...a, isCorrect: i === (firstTrueIndex >= 0 ? firstTrueIndex : 0), orderIndex: i, answerText: a.answerText || (i === 0 ? 'true' : 'false') }));
+    } else {
+      if (!answers.some((a: any) => a.isCorrect)) {
+        answers = answers.map((a: any, i: number) => ({ ...a, isCorrect: i === 0, orderIndex: i }));
+      } else {
+        answers = answers.map((a: any, i: number) => ({ ...a, orderIndex: i }));
+      }
+      if (answers.length < 2) {
+        answers.push({ answerText: 'خيار', isCorrect: false, orderIndex: answers.length });
+      }
+    }
+    return {
+      questionText: q.questionText,
+      questionType: type,
+      orderIndex: q.orderIndex,
+      answers
+    };
   }
 
   deleteQuiz(id: number) {

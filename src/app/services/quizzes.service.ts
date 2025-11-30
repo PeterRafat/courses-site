@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Quiz, Question, Answer, UserQuizAttempt } from '../models/entities';
-import { USE_MOCK, mockQuizzes, mockQuestions, mockAnswers } from '../mock/mock-data';
 import { environment } from '../../environments/environment';
 import { ErrorHandlerService } from '../core/error-handler.service';
 
@@ -53,7 +52,6 @@ export class QuizzesService {
   constructor(private http: HttpClient, private errorHandler: ErrorHandlerService) {}
 
   getQuiz(quizId: number): Observable<Quiz> {
-    if (USE_MOCK) return of(mockQuizzes.find(q => q.quizId === quizId)!);
     return this.http.get<Quiz>(`${this.baseUrl}/quizzes/${quizId}`).pipe(
       catchError(err => { this.errorHandler.showError(err, 'فشل تحميل الكويز'); return of({
         quizId,
@@ -69,14 +67,12 @@ export class QuizzesService {
   }
 
   getQuestions(quizId: number): Observable<Question[]> {
-    if (USE_MOCK) return of(mockQuestions.filter(q => q.quizId === quizId));
     return this.http.get<Question[]>(`${this.baseUrl}/quizzes/${quizId}/questions`).pipe(
       catchError(err => { this.errorHandler.showError(err, 'فشل تحميل أسئلة الكويز'); return of([]); })
     );
   }
 
   getAnswers(quizId: number): Observable<Answer[]> {
-    if (USE_MOCK) return of(mockAnswers.filter(a => mockQuestions.some(q => q.quizId === quizId && q.questionId === a.questionId)));
     return this.http.get<Answer[]>(`${this.baseUrl}/quizzes/${quizId}/answers`).pipe(
       catchError(err => { this.errorHandler.showError(err, 'فشل تحميل إجابات الكويز'); return of([]); })
     );
@@ -84,7 +80,6 @@ export class QuizzesService {
 
   submitAttempt(body: SubmitAttemptRequest): Observable<{ attemptId: number }>
   {
-    if (USE_MOCK) return of({ attemptId: Math.floor(Math.random() * 10000) });
     return this.http.post<{ attemptId: number }>(`${this.baseUrl}/quizzes/attempts`, body).pipe(
       catchError(err => { this.errorHandler.showError(err, 'فشل بدء المحاولة'); return of({ attemptId: -1 }); })
     );
@@ -97,33 +92,18 @@ export class QuizzesService {
   }
 
   submitQuiz(quizId: number, body: SubmitQuizRequest): Observable<SubmitQuizResult> {
-    if (USE_MOCK) {
-      return of({
-        id: body.attemptId,
-        userId: 0,
-        quizId,
-        startedAt: new Date().toISOString(),
-        completedAt: new Date().toISOString(),
-        score: 100,
-        correctAnswers: body.answers.length,
-        totalQuestions: body.answers.length,
-        isPassed: true
-      });
-    }
     return this.http
       .post<{ success: boolean; message: string; data: SubmitQuizResult; errors: string[] }>(`${this.baseUrl}/Quizzes/${quizId}/submit`, body)
       .pipe(map(res => res.data));
   }
 
   getAttemptsHistory(): Observable<SubmitQuizResult[]> {
-    if (USE_MOCK) return of([]);
     return this.http
       .get<{ success: boolean; message: string; data: SubmitQuizResult[]; errors: string[] }>(`${this.baseUrl}/Quizzes/attempts/history`)
       .pipe(map(res => res.data ?? []));
   }
 
   getCourseAttempts(courseId: number): Observable<SubmitQuizResult[]> {
-    if (USE_MOCK) return of([]);
     return this.http
       .get<{ success: boolean; message: string; data: SubmitQuizResult[]; errors: string[] }>(`${this.baseUrl}/Quizzes/courses/${courseId}/attempts`)
       .pipe(map(res => res.data ?? []));

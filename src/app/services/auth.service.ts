@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 import { User } from '../models/entities';
-import { USE_MOCK, mockUsers } from '../mock/mock-data';
 import { environment } from '../../environments/environment';
 import { ErrorHandlerService } from '../core/error-handler.service';
 
@@ -27,61 +26,162 @@ export class AuthService {
   constructor(private http: HttpClient, private errorHandler: ErrorHandlerService) {}
 
   login(body: LoginRequest): Observable<{ token: string; refreshToken?: string; user: User }> {
-    if (USE_MOCK) return of({ token: 'mock-token', user: mockUsers[0] });
-    return this.http.post<{ success: boolean; message: string; data: any; errors: string[] }>(`${this.baseUrl}/Auth/login`, body).pipe(
+    // Log the request for debugging
+    console.log('Login request:', `${this.baseUrl}/Auth/login`, body);
+    return this.http.post<any>(`${this.baseUrl}/Auth/login`, body).pipe(
       map(res => {
-        const token = res?.data?.token ?? '';
-        const refreshToken = res?.data?.refreshToken ?? '';
-        const u = res?.data?.user ?? {};
+        // Log the response for debugging
+        console.log('Login response:', res);
+        
+        // Handle various possible response formats
+        let data = res;
+        // If response has a data property, use that
+        if (res && typeof res === 'object' && 'data' in res) {
+          data = res.data;
+        }
+        
+        // Extract token (could be in different places)
+        const token = data?.token ?? data?.accessToken ?? res?.token ?? res?.accessToken ?? '';
+        const refreshToken = data?.refreshToken ?? res?.refreshToken ?? '';
+        
+        // Extract user data (could be in different places)
+        let userData = data;
+        if (data && typeof data === 'object' && 'user' in data) {
+          userData = data.user;
+        } else if (res && typeof res === 'object' && 'user' in res) {
+          userData = res.user;
+        }
+        
+        // Create user object with fallbacks
         const user: User = {
-          userId: u.id ?? 0,
-          fullName: u.fullName ?? '',
-          email: u.email ?? body.email,
-          phone: u.phone ?? '',
-          role: u.role ?? undefined,
-          isActive: !!u.isActive,
-          createdAt: u.createdAt ?? new Date().toISOString()
+          userId: userData?.id ?? userData?.userId ?? data?.id ?? data?.userId ?? 0,
+          fullName: userData?.fullName ?? userData?.name ?? data?.fullName ?? data?.name ?? '',
+          email: userData?.email ?? data?.email ?? body.email,
+          phone: userData?.phone ?? data?.phone ?? '',
+          role: userData?.role ?? data?.role ?? undefined,
+          isActive: !!(userData?.isActive ?? data?.isActive ?? userData?.active ?? data?.active ?? true),
+          createdAt: userData?.createdAt ?? data?.createdAt ?? userData?.createdDate ?? data?.createdDate ?? new Date().toISOString()
         } as User;
-        if (token) { try { localStorage.setItem('token', token); } catch {} }
-        if (refreshToken) { try { localStorage.setItem('refreshToken', refreshToken); } catch {} }
-        if (user.role) { try { localStorage.setItem('role', String(user.role)); } catch {} }
+        
+        // Store tokens and role in localStorage
+        if (token) { 
+          try { localStorage.setItem('token', token); } catch (e) { console.warn('Failed to store token:', e); }
+        }
+        if (refreshToken) { 
+          try { localStorage.setItem('refreshToken', refreshToken); } catch (e) { console.warn('Failed to store refresh token:', e); }
+        }
+        if (user.role) { 
+          try { localStorage.setItem('role', String(user.role)); } catch (e) { console.warn('Failed to store role:', e); }
+        }
+        
         return { token, refreshToken, user };
       }),
-      catchError(err => { this.errorHandler.showError(err, 'فشل تسجيل الدخول'); return throwError(() => err); })
+      catchError(err => { 
+        console.error('Login error:', err);
+        // Provide more specific error message for common issues
+        let errorMessage = 'فشل تسجيل الدخول';
+        if (err?.status === 500) {
+          errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً';
+        } else if (err?.status === 0) {
+          errorMessage = 'لا يمكن الاتصال بالخادم. تحقق من اتصالك بالإنترنت';
+        }
+        this.errorHandler.showError(err, errorMessage); 
+        return throwError(() => err); 
+      })
     );
   }
 
   register(body: RegisterRequest): Observable<User> {
-    if (USE_MOCK) return of({ ...mockUsers[0], userId: 2, fullName: body.fullName, email: body.email, phone: body.phone });
-    return this.http.post<{ success: boolean; message: string; data: any; errors: string[] }>(`${this.baseUrl}/Auth/register`, body).pipe(
-      map(res => ({
-        userId: res?.data?.id ?? 0,
-        fullName: res?.data?.fullName ?? body.fullName,
-        email: res?.data?.email ?? body.email,
-        phone: res?.data?.phone ?? body.phone,
-        role: res?.data?.role ?? undefined,
-        isActive: !!res?.data?.isActive,
-        createdAt: res?.data?.createdAt ?? new Date().toISOString()
-      } as User)),
-      catchError(err => { this.errorHandler.showError(err, 'فشل إنشاء الحساب'); return throwError(() => err); })
+    console.log('Register request:', `${this.baseUrl}/Auth/register`, body);
+    return this.http.post<any>(`${this.baseUrl}/Auth/register`, body).pipe(
+      map(res => {
+        console.log('Register response:', res);
+        // Handle various possible response formats
+        let data = res;
+        // If response has a data property, use that
+        if (res && typeof res === 'object' && 'data' in res) {
+          data = res.data;
+        }
+        
+        // Extract user data (could be in different places)
+        let userData = data;
+        if (data && typeof data === 'object' && 'user' in data) {
+          userData = data.user;
+        } else if (res && typeof res === 'object' && 'user' in res) {
+          userData = res.user;
+        }
+        
+        // Create user object with fallbacks
+        return {
+          userId: userData?.id ?? userData?.userId ?? data?.id ?? data?.userId ?? 0,
+          fullName: userData?.fullName ?? userData?.name ?? data?.fullName ?? data?.name ?? body.fullName,
+          email: userData?.email ?? data?.email ?? body.email,
+          phone: userData?.phone ?? data?.phone ?? body.phone,
+          role: userData?.role ?? data?.role ?? undefined,
+          isActive: !!(userData?.isActive ?? data?.isActive ?? userData?.active ?? data?.active ?? true),
+          createdAt: userData?.createdAt ?? data?.createdAt ?? userData?.createdDate ?? data?.createdDate ?? new Date().toISOString()
+        } as User;
+      }),
+      catchError(err => { 
+        console.error('Register error:', err);
+        // Provide more specific error message for common issues
+        let errorMessage = 'فشل إنشاء الحساب';
+        if (err?.status === 500) {
+          errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً';
+        } else if (err?.status === 0) {
+          errorMessage = 'لا يمكن الاتصال بالخادم. تحقق من اتصالك بالإنترنت';
+        }
+        this.errorHandler.showError(err, errorMessage); 
+        return throwError(() => err); 
+      })
     );
   }
 
   me(): Observable<User> {
-    if (USE_MOCK) return of(mockUsers[0]);
-    return this.http.get<{ success: boolean; message: string; data: any; errors: string[] }>(`${this.baseUrl}/Auth/me`).pipe(
-      map(res => ({
-        userId: res?.data?.id ?? 0,
-        fullName: res?.data?.fullName ?? '',
-        email: res?.data?.email ?? '',
-        phone: res?.data?.phone ?? '',
-        role: res?.data?.role ?? undefined,
-        isActive: !!res?.data?.isActive,
-        createdAt: res?.data?.createdAt ?? new Date().toISOString()
-      } as User)),
-      catchError(err => { this.errorHandler.showError(err, 'فشل جلب بيانات المستخدم'); return of({
-        userId: 0, fullName: '', phone: '', email: '', createdAt: new Date().toISOString(), isActive: false
-      } as User); })
+    console.log('Me request:', `${this.baseUrl}/Auth/me`);
+    return this.http.get<any>(`${this.baseUrl}/Auth/me`).pipe(
+      map(res => {
+        console.log('Me response:', res);
+        // Handle various possible response formats
+        let data = res;
+        // If response has a data property, use that
+        if (res && typeof res === 'object' && 'data' in res) {
+          data = res.data;
+        }
+        
+        // Extract user data (could be in different places)
+        let userData = data;
+        if (data && typeof data === 'object' && 'user' in data) {
+          userData = data.user;
+        } else if (res && typeof res === 'object' && 'user' in res) {
+          userData = res.user;
+        }
+        
+        // Create user object with fallbacks
+        return {
+          userId: userData?.id ?? userData?.userId ?? data?.id ?? data?.userId ?? 0,
+          fullName: userData?.fullName ?? userData?.name ?? data?.fullName ?? data?.name ?? '',
+          email: userData?.email ?? data?.email ?? '',
+          phone: userData?.phone ?? data?.phone ?? '',
+          role: userData?.role ?? data?.role ?? undefined,
+          isActive: !!(userData?.isActive ?? data?.isActive ?? userData?.active ?? data?.active ?? true),
+          createdAt: userData?.createdAt ?? data?.createdAt ?? userData?.createdDate ?? data?.createdDate ?? new Date().toISOString()
+        } as User;
+      }),
+      catchError(err => { 
+        console.error('Me error:', err);
+        // Provide more specific error message for common issues
+        let errorMessage = 'فشل جلب بيانات المستخدم';
+        if (err?.status === 500) {
+          errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً';
+        } else if (err?.status === 0) {
+          errorMessage = 'لا يمكن الاتصال بالخادم. تحقق من اتصالك بالإنترنت';
+        }
+        this.errorHandler.showError(err, errorMessage); 
+        return of({
+          userId: 0, fullName: '', phone: '', email: '', createdAt: new Date().toISOString(), isActive: false
+        } as User); 
+      })
     );
   }
 

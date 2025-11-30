@@ -66,4 +66,6 @@ export class CourseDetailComponent {
       }
     });
   }
+
+  // removed conversion for UI-only label change
 }

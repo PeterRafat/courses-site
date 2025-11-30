@@ -157,7 +157,7 @@
                   <div class="col-md-6">
                     <div class="admin-form-group">
                       <label class="admin-form-label">نوع السؤال *</label>
-                      <select class="form-select admin-form-select" formControlName="questionType">
+                      <select class="form-select admin-form-select" formControlName="questionType" (change)="onQuestionTypeChange(qi)">
                         <option [value]="0">اختيار</option>
                         <option [value]="1">صح أو خطأ</option>
                       </select>
@@ -177,7 +177,7 @@
                     <strong>
                       <i class="bi bi-chat-left-dots me-2"></i>الخيارات
                     </strong>
-                    <button type="button" class="admin-btn admin-btn-success admin-btn-sm" (click)="addAnswer(qi)">
+                    <button type="button" class="admin-btn admin-btn-success admin-btn-sm" (click)="addAnswer(qi)" [disabled]="+question.get('questionType')?.value === 1">
                       <i class="bi bi-plus-circle me-1"></i>إضافة خيار
                     </button>
                   </div>
@@ -187,20 +187,20 @@
                          class="admin-list-item" [formGroupName]="ai">
                       <div class="row align-items-center admin-gap-2">
                         <div class="col-md-7">
-                          <input class="form-control admin-form-control" formControlName="answerText" placeholder="نص الخيار" />
+                          <input class="form-control admin-form-control" formControlName="answerText" placeholder="نص الخيار" [readonly]="+question.get('questionType')?.value === 1" />
                           <div *ngIf="answer.get('answerText')?.invalid && answer.get('answerText')?.touched" class="admin-error-text">
                             <i class="bi bi-exclamation-circle me-1"></i>نص الخيار مطلوب
                           </div>
                         </div>
                         <div class="col-md-3">
                           <div class="admin-form-check">
-                            <input class="admin-form-check-input" type="checkbox" formControlName="isCorrect" id="correct{{qi}}{{ai}}" />
+                            <input class="admin-form-check-input" type="checkbox" formControlName="isCorrect" id="correct{{qi}}{{ai}}" (change)="onToggleCorrectTF(qi, ai)" />
                             <label class="admin-form-check-label" for="correct{{qi}}{{ai}}">صحيح</label>
                           </div>
                         </div>
                         <div class="col-md-2">
                           <div class="d-flex gap-2">
-                            <input class="form-control admin-form-control" type="number" formControlName="orderIndex" min="1" placeholder="ترتيب" />
+                            <input class="form-control admin-form-control" type="number" formControlName="orderIndex" min="0" placeholder="ترتيب" [readonly]="+question.get('questionType')?.value === 1" />
                             <button type="button" class="admin-btn admin-btn-danger admin-btn-sm" (click)="deleteAnswer(qi, ai)" 
                                     [disabled]="getAnswers(qi).length <= 2">
                               <i class="bi bi-trash"></i>
