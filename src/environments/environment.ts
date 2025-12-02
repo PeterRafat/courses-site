@@ -1,6 +1,7 @@
 // Development environment configuration
+// Local development URLs: https://localhost:7000
 export const environment = {
   production: false,
-  apiBaseUrl: 'https://localhost:7000/api',
-  videoBaseUrl: 'https://localhost:7000'
+  apiBaseUrl: 'http://mahmoudsalama8-001-site1.ktempurl.com/api',
+  videoBaseUrl: 'http://mahmoudsalama8-001-site1.ktempurl.com'
 };
