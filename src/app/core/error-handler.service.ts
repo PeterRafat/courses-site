@@ -32,6 +32,10 @@ export class ErrorHandlerService {
       // Status code based messages
       switch (error.status) {
         case 0:
+          // More detailed error message for network issues
+          if (error.statusText === 'Unknown Error') {
+            return 'لا يمكن الاتصال بالخادم. قد يكون السبب أحد ما يلي:\n- تحقق من اتصالك بالإنترنت\n- تحقق من إعدادات جدار الحماية\n- قد تكون هناك مشكلة في سياسة CORS\n- قد تكون هناك مشكلة في شهادة SSL';
+          }
           return 'لا يمكن الاتصال بالخادم. تحقق من اتصالك بالإنترنت';
         case 400:
           return 'الطلب غير صحيح. تحقق من البيانات المدخلة';

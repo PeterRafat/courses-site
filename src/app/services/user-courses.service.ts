@@ -28,6 +28,7 @@ export class UserCoursesService {
    * Get all courses assigned to the current user
    */
   getMyCourses(): Observable<UserCourseWithDetails[]> {
+    console.log('Fetching user courses from:', `${this.baseUrl}/user-courses/my-courses`);
     const headers = new HttpHeaders({ Accept: 'application/json' });
     return this.http
       .get<{ success: boolean; message: string; data: any[]; errors: string[] }>(

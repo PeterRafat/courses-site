@@ -9,6 +9,9 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem('token') : null;
   
+  // Log the request for debugging
+  console.log('Making HTTP request:', req.method, req.url);
+  
   // Add common headers for API requests
   let headers: { [key: string]: string } = {
     'Content-Type': 'application/json',

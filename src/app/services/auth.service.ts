@@ -84,6 +84,14 @@ export class AuthService {
           errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً';
         } else if (err?.status === 0) {
           errorMessage = 'لا يمكن الاتصال بالخادم. تحقق من اتصالك بالإنترنت';
+          // Log additional details for network errors
+          console.error('Network error details:', {
+            url: `${this.baseUrl}/Auth/login`,
+            status: err.status,
+            statusText: err.statusText,
+            message: err.message,
+            error: err.error
+          });
         }
         this.errorHandler.showError(err, errorMessage); 
         return throwError(() => err); 
@@ -130,6 +138,14 @@ export class AuthService {
           errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً';
         } else if (err?.status === 0) {
           errorMessage = 'لا يمكن الاتصال بالخادم. تحقق من اتصالك بالإنترنت';
+          // Log additional details for network errors
+          console.error('Network error details:', {
+            url: `${this.baseUrl}/Auth/register`,
+            status: err.status,
+            statusText: err.statusText,
+            message: err.message,
+            error: err.error
+          });
         }
         this.errorHandler.showError(err, errorMessage); 
         return throwError(() => err); 
@@ -176,6 +192,14 @@ export class AuthService {
           errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً';
         } else if (err?.status === 0) {
           errorMessage = 'لا يمكن الاتصال بالخادم. تحقق من اتصالك بالإنترنت';
+          // Log additional details for network errors
+          console.error('Network error details:', {
+            url: `${this.baseUrl}/Auth/me`,
+            status: err.status,
+            statusText: err.statusText,
+            message: err.message,
+            error: err.error
+          });
         }
         this.errorHandler.showError(err, errorMessage); 
         return of({
