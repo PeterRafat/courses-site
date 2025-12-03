@@ -59,9 +59,9 @@ export class AdminService {
     form.append('price', String(params.price));
     form.append('isFree', String(params.isFree));
     form.append('courseImage', imageFile);
-    const headers = new HttpHeaders({ Accept: 'application/json, text/plain, */*' });
+    // Note: Not setting any headers as browser should set Content-Type automatically for FormData
     return this.http
-      .post(`${this.baseUrl}/admin/courses/upload`, form, { headers, observe: 'response', responseType: 'text' })
+      .post(`${this.baseUrl}/admin/courses/upload`, form, { observe: 'response', responseType: 'text' })
       .pipe(
         map((resp) => {
           const text = resp.body ?? '';
@@ -89,19 +89,26 @@ export class AdminService {
     form.append('price', String(params.price));
     form.append('isFree', String(params.isFree));
     form.append('courseImage', imageFile);
+    // Note: Not setting any headers as browser should set Content-Type automatically for FormData
     return this.http
-      .put<{ success: boolean; message: string; data: any; errors: string[] }>(`${this.baseUrl}/admin/courses/${id}/upload`, form)
+      .put(`${this.baseUrl}/admin/courses/${id}/upload`, form, { observe: 'response', responseType: 'text' })
       .pipe(
-        map(res => ({
-          courseId: res?.data?.id ?? id,
-          courseName: res?.data?.courseName ?? params.courseName,
-          courseImage: res?.data?.courseImage ?? '',
-          description: res?.data?.description ?? params.description ?? '',
-          price: res?.data?.price ?? params.price,
-          isFree: res?.data?.isFree ?? params.isFree,
-          createdAt: res?.data?.createdAt ?? new Date().toISOString(),
-          updatedAt: res?.data?.updatedAt ?? new Date().toISOString()
-        } as Course))
+        map((resp) => {
+          const text = resp.body ?? '';
+          let bodyObj: any = text;
+          try { bodyObj = JSON.parse(text); } catch {}
+          const d = bodyObj?.data ?? {};
+          return {
+            courseId: d?.id ?? id,
+            courseName: d?.courseName ?? params.courseName,
+            courseImage: d?.courseImage ?? '',
+            description: d?.description ?? params.description ?? '',
+            price: d?.price ?? params.price,
+            isFree: d?.isFree ?? params.isFree,
+            createdAt: d?.createdAt ?? new Date().toISOString(),
+            updatedAt: d?.updatedAt ?? new Date().toISOString()
+          } as Course;
+        })
       );
   }
 
@@ -194,9 +201,9 @@ export class AdminService {
     form.append('duration', String(params.duration));
     form.append('orderIndex', String(params.orderIndex));
     form.append('videoFile', file);
-    const headers = new HttpHeaders({ Accept: 'application/json, text/plain, */*' });
+    // Note: Not setting any headers as browser should set Content-Type automatically for FormData
     return this.http
-      .post(`${this.baseUrl}/admin/videos/upload`, form, { headers, observe: 'response', responseType: 'text' })
+      .post(`${this.baseUrl}/admin/videos/upload`, form, { observe: 'response', responseType: 'text' })
       .pipe(
         map((resp) => {
           const text = resp.body ?? '';

@@ -12,11 +12,19 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   // Log the request for debugging
   console.log('Making HTTP request:', req.method, req.url);
   
-  // Add common headers for API requests
-  let headers: { [key: string]: string } = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  };
+  // Check if this is a FormData request
+  const isFormData = req.body instanceof FormData;
+  
+  // Add common headers for API requests, but not for FormData
+  let headers: { [key: string]: string } = {};
+  
+  // Only add Content-Type for non-FormData requests
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
+  
+  // Always add Accept header
+  headers['Accept'] = 'application/json';
   
   // Add authorization header if token exists and it's not a login/register request
   if (token && !req.url.includes('/Auth/login') && !req.url.includes('/Auth/register')) {
