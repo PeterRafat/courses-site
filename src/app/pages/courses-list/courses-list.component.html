@@ -1,19 +1,26 @@
 <div class="container py-3">
-  <div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 gap-2">
     <h2 class="mb-0">جميع الكورسات</h2>
     <a routerLink="/courses" class="btn btn-outline-primary">تحديث</a>
   </div>
   <div class="row g-3" [@fadeInUp]>
-    <div class="col-md-4" *ngFor="let c of courses">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3" *ngFor="let c of courses">
       <div class="card h-100 course-card">
-        <img *ngIf="c.courseImage" [src]="c.courseImage" class="card-img-top" alt="" (error)="onImageError($event)" />
-        <div class="card-body">
-          <h5 class="card-title">{{ c.courseName }}</h5>
-          <p class="card-text text-muted">{{ c.description }}</p>
+        <div class="course-card-image-wrapper">
+          <img *ngIf="c.courseImage" [src]="c.courseImage" class="card-img-top" alt="{{ c.courseName }}" (error)="onImageError($event)" />
+          <div *ngIf="!c.courseImage" class="course-card-placeholder">
+            <i class="bi bi-image"></i>
+          </div>
         </div>
-        <div class="card-footer d-flex justify-content-between align-items-center">
-          <span class="badge" [class.bg-success]="c.isFree" [class.bg-primary]="!c.isFree">{{ c.isFree ? 'مجاني' : 'مدفوع' }}</span>
-          <span *ngIf="!c.isFree && accessible.has(c.courseId)" class="badge bg-success">لديك وصول</span>
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ c.courseName }}</h5>
+          <p class="card-text text-muted flex-grow-1">{{ c.description || 'لا يوجد وصف متاح' }}</p>
+        </div>
+        <div class="card-footer d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge" [class.bg-success]="c.isFree" [class.bg-primary]="!c.isFree">{{ c.isFree ? 'مجاني' : 'مدفوع' }}</span>
+            <span *ngIf="!c.isFree && accessible.has(c.courseId)" class="badge bg-success">لديك وصول</span>
+          </div>
           <a class="btn btn-primary btn-sm" [routerLink]="['/courses', c.courseId]">تفاصيل</a>
         </div>
       </div>

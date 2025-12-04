@@ -2,7 +2,7 @@
   <div class="auth-left">
     <div class="auth-box">
       <div class="auth-brand">
-        <img src="logo.png" alt="logo" class="auth-logo" onerror="this.style.display='none'" />
+        <img src="logo.png" alt="logo" class="auth-logo" onerror="this.style.display='none'" loading="lazy" width="80" height="60" />
         <div class="auth-title"></div>
       </div>
 
@@ -24,7 +24,6 @@
             <input type="checkbox" id="remember" /> 
             <label for="remember">تذكرني</label>
           </div>
-          <a class="auth-forgot" routerLink="/forgot">نسيت كلمة المرور؟</a>
         </div>
 
         <button class="auth-primary" type="submit" [disabled]="form.invalid || loading">
@@ -42,7 +41,7 @@
     <div class="auth-hero">
       <h1>Welcome to our community</h1>
       <p>Personalized, updated daily, and beautifully presented. Sign in to access courses and platform features.</p>
-      <div class="hero-figure"><img src="../../../../office.png" alt="" width="200"></div>
+      <div class="hero-figure"><img src="../../../../office.png" alt="Office" width="200" loading="lazy" height="150"></div>
     </div>
   </div>
 </div>

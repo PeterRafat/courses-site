@@ -1,19 +1,42 @@
 .bg-light{background:#f8f9fa!important}
 
-/* Footer: use natural flow (not fixed). Use sticky-footer layout via app-root flex.
-   Footer will sit after the page content and remain at the bottom when content is short. */
+/* Footer: sticky to bottom using flex layout strategy.
+   Footer will appear after all content and stick to bottom of viewport when content is short. */
 footer.footer-dark {
   position: relative;
   width: 100%;
   box-shadow: 0 -6px 20px rgba(0,0,0,0.06);
-  padding: 0.75rem 0;
+  padding: 2rem 0;
   display: flex;
   align-items: center;
+  margin-top: auto;
+  flex-shrink: 0;
+  background: #2d3436;
+  color: #fff;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+footer.footer-dark .container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 @media (max-width: 767px) {
   footer.footer-dark {
     box-shadow: none;
-    padding: 0.75rem 0.5rem;
+    padding: 1rem 0.5rem;
+  }
+
+  footer.footer-dark .container {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  footer.footer-dark .d-flex.gap-3 {
+    justify-content: center;
+    flex-wrap: wrap;
   }
 }

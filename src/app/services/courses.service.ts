@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Observable, of, BehaviorSubject } from 'rxjs';
+import { catchError, map, shareReplay, tap } from 'rxjs/operators';
 import { Course, CourseVideo, Quiz } from '../models/entities';
 import { formatCourseImageUrl, formatVideoUrl } from '../utils/image-url.util';
 import { environment } from '../../environments/environment';
@@ -10,11 +10,24 @@ import { ErrorHandlerService } from '../core/error-handler.service';
 @Injectable({ providedIn: 'root' })
 export class CoursesService {
   private baseUrl = environment.apiBaseUrl;
+  private coursesCache$?: Observable<Course[]>;
+  private coursesCacheTime?: number;
+  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
 
   constructor(private http: HttpClient, private errorHandler: ErrorHandlerService) {}
 
   getCourses(): Observable<Course[]> {
-    return this.http.get<{ success: boolean; message: string; data: any[]; errors: string[] }>(`${this.baseUrl}/Courses`).pipe(
+    // Check if we have a valid cache
+    const now = Date.now();
+    if (this.coursesCache$ && this.coursesCacheTime && (now - this.coursesCacheTime < this.CACHE_DURATION)) {
+      console.log('Returning cached courses');
+      return this.coursesCache$;
+    }
+    
+    console.log('Fetching fresh courses from API');
+    
+    // Create new request with caching
+    this.coursesCache$ = this.http.get<{ success: boolean; message: string; data: any[]; errors: string[] }>(`${this.baseUrl}/Courses`).pipe(
       map(res => (res?.data ?? []).map(item => ({
         courseId: item.id,
         courseName: item.courseName,
@@ -25,12 +38,34 @@ export class CoursesService {
         createdAt: item.createdAt,
         updatedAt: item.updatedAt
       } as Course))),
+      shareReplay(1, this.CACHE_DURATION), // Cache for 5 minutes
       catchError(err => { this.errorHandler.showError(err, 'فشل تحميل الكورسات'); return of([]); })
     );
+    
+    this.coursesCacheTime = now;
+    return this.coursesCache$;
   }
 
+  // Cache for individual courses
+  private courseCache = new Map<number, Observable<Course>>();
+  private courseCacheTime = new Map<number, number>();
+  private readonly COURSE_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
   getCourse(courseId: number): Observable<Course> {
-    return this.http.get<{ success: boolean; message: string; data: any; errors: string[] }>(`${this.baseUrl}/Courses/${courseId}`).pipe(
+    // Check if we have a valid cache for this course
+    const now = Date.now();
+    const cachedCourse = this.courseCache.get(courseId);
+    const cacheTime = this.courseCacheTime.get(courseId);
+    
+    if (cachedCourse && cacheTime && (now - cacheTime < this.COURSE_CACHE_DURATION)) {
+      console.log(`Returning cached course ${courseId}`);
+      return cachedCourse;
+    }
+    
+    console.log(`Fetching fresh course ${courseId} from API`);
+    
+    // Create new request with caching
+    const course$ = this.http.get<{ success: boolean; message: string; data: any; errors: string[] }>(`${this.baseUrl}/Courses/${courseId}`).pipe(
       map(res => ({
         courseId: res?.data?.id ?? courseId,
         courseName: res?.data?.courseName ?? 'غير متاح',
@@ -41,6 +76,7 @@ export class CoursesService {
         createdAt: res?.data?.createdAt ?? new Date().toISOString(),
         updatedAt: res?.data?.updatedAt ?? new Date().toISOString()
       } as Course)),
+      shareReplay(1, this.COURSE_CACHE_DURATION), // Cache for 5 minutes
       catchError(err => { this.errorHandler.showError(err, 'فشل تحميل الكورس'); return of({
         courseId,
         courseName: 'غير متاح',
@@ -52,10 +88,34 @@ export class CoursesService {
         updatedAt: new Date().toISOString()
       } as Course); })
     );
+    
+    // Store in cache
+    this.courseCache.set(courseId, course$);
+    this.courseCacheTime.set(courseId, now);
+    
+    return course$;
   }
 
+  // Cache for course videos
+  private courseVideosCache = new Map<number, Observable<CourseVideo[]>>();
+  private courseVideosCacheTime = new Map<number, number>();
+  private readonly VIDEOS_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
   getCourseVideos(courseId: number): Observable<CourseVideo[]> {
-    return this.http
+    // Check if we have a valid cache for this course's videos
+    const now = Date.now();
+    const cachedVideos = this.courseVideosCache.get(courseId);
+    const cacheTime = this.courseVideosCacheTime.get(courseId);
+    
+    if (cachedVideos && cacheTime && (now - cacheTime < this.VIDEOS_CACHE_DURATION)) {
+      console.log(`Returning cached videos for course ${courseId}`);
+      return cachedVideos;
+    }
+    
+    console.log(`Fetching fresh videos for course ${courseId} from API`);
+    
+    // Create new request with caching
+    const videos$ = this.http
       .get<{ success: boolean; message: string; data: any[]; errors: string[] }>(`${this.baseUrl}/Courses/${courseId}/videos`)
       .pipe(
         map(res => (res?.data ?? []).map(item => ({
@@ -66,14 +126,38 @@ export class CoursesService {
           duration: item.duration ?? 0,
           orderIndex: item.orderIndex ?? 1
         } as CourseVideo))),
+        shareReplay(1, this.VIDEOS_CACHE_DURATION), // Cache for 5 minutes
         catchError(err => { this.errorHandler.showError(err, 'فشل تحميل فيديوهات الكورس'); return of([]); })
       );
+    
+    // Store in cache
+    this.courseVideosCache.set(courseId, videos$);
+    this.courseVideosCacheTime.set(courseId, now);
+    
+    return videos$;
   }
 
+  // Cache for course quizzes
+  private courseQuizzesCache = new Map<number, Observable<Quiz[]>>();
+  private courseQuizzesCacheTime = new Map<number, number>();
+  private readonly QUIZZES_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
   getCourseQuizzes(courseId: number): Observable<Quiz[]> {
+    // Check if we have a valid cache for this course's quizzes
+    const now = Date.now();
+    const cachedQuizzes = this.courseQuizzesCache.get(courseId);
+    const cacheTime = this.courseQuizzesCacheTime.get(courseId);
+    
+    if (cachedQuizzes && cacheTime && (now - cacheTime < this.QUIZZES_CACHE_DURATION)) {
+      console.log(`Returning cached quizzes for course ${courseId}`);
+      return cachedQuizzes;
+    }
+    
+    console.log(`Fetching fresh quizzes for course ${courseId} from API`);
+    
     // Note: Backend should provide /api/Quizzes/courses/{courseId} endpoint
     // For now, using admin endpoint - may fail with 403 for non-admin users
-    return this.http
+    const quizzes$ = this.http
       .get<{ success: boolean; message: string; data: any[]; errors: string[] }>(`${this.baseUrl}/admin/quizzes/courses/${courseId}`)
       .pipe(
         map((res) =>
@@ -90,8 +174,15 @@ export class CoursesService {
             } as Quiz)
           )
         ),
+        shareReplay(1, this.QUIZZES_CACHE_DURATION), // Cache for 5 minutes
         catchError((err) => { this.errorHandler.showError(err, 'فشل تحميل كويزات الكورس'); return of([]); })
       );
+    
+    // Store in cache
+    this.courseQuizzesCache.set(courseId, quizzes$);
+    this.courseQuizzesCacheTime.set(courseId, now);
+    
+    return quizzes$;
   }
 
   getVideo(videoId: number): Observable<CourseVideo> {
@@ -116,7 +207,7 @@ export class CoursesService {
           } as CourseVideo;
         }),
         catchError(err => { 
-          this.errorHandler.showError(err, 'فشل تحميل الفيديو');
+          // Removed error alert - user doesn't want alerts
           return of({
             videoId, 
             courseId: 0, 
@@ -150,7 +241,7 @@ export class CoursesService {
           return result;
         }),
         catchError(err => { 
-          this.errorHandler.showError(err, 'فشل الحصول على رابط الفيديو');
+          // Removed error alert - user doesn't want alerts
           return of({ 
             signedUrl: '', 
             expiresAt: new Date().toISOString(), 
@@ -159,5 +250,17 @@ export class CoursesService {
           }); 
         })
       );
+  }
+
+  // Method to clear all caches
+  clearCache(): void {
+    this.coursesCache$ = undefined;
+    this.coursesCacheTime = undefined;
+    this.courseCache.clear();
+    this.courseCacheTime.clear();
+    this.courseVideosCache.clear();
+    this.courseVideosCacheTime.clear();
+    this.courseQuizzesCache.clear();
+    this.courseQuizzesCacheTime.clear();
   }
 }

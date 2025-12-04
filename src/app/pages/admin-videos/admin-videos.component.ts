@@ -7,6 +7,7 @@ import { AdminService } from '../../services/admin.service';
 import { CoursesService } from '../../services/courses.service';
 import { Course } from '../../models/entities';
 import { ErrorHandlerService } from '../../core/error-handler.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-admin-videos',
@@ -25,7 +26,7 @@ export class AdminVideosComponent {
   selectedCourseId?: number | null;
   videos: { id: number; title: string; url: string; duration: number; orderIndex: number }[] = [];
 
-  constructor(private fb: FormBuilder, private admin: AdminService, private coursesSvc: CoursesService, private errorHandler: ErrorHandlerService) {
+  constructor(private fb: FormBuilder, private admin: AdminService, private coursesSvc: CoursesService, private errorHandler: ErrorHandlerService, private toastr: ToastrService) {
     this.form = this.fb.group({
       courseId: [null, Validators.required],
       videoTitle: ['', Validators.required],
@@ -54,6 +55,7 @@ export class AdminVideosComponent {
         next: (created) => { 
           this.loading = false; 
           this.success('تم إضافة الفيديو'); 
+          this.toastr.success('تم إضافة الفيديو بنجاح');
           this.refreshVideos(courseId);
           this.resetForm(); 
         },
@@ -65,6 +67,7 @@ export class AdminVideosComponent {
         next: (created) => { 
           this.loading = false; 
           this.success('تم رفع الفيديو'); 
+          this.toastr.success('تم رفع الفيديو بنجاح');
           this.refreshVideos(courseId);
           this.resetForm(); 
         },
@@ -105,7 +108,7 @@ export class AdminVideosComponent {
   updateVideo(v: { id: number; title: string; url: string; duration: number; orderIndex: number }) {
     this.loading = true;
     this.admin.updateVideo(v.id, { courseId: this.selectedCourseId ?? 0, videoTitle: v.title, videoUrl: v.url, duration: v.duration, orderIndex: v.orderIndex }).subscribe({
-      next: () => { this.loading = false; this.success('تم تحديث الفيديو'); },
+      next: () => { this.loading = false; this.success('تم تحديث الفيديو'); this.toastr.success('تم تحديث الفيديو بنجاح'); },
       error: (err) => this.setError(err)
     });
   }
@@ -122,6 +125,7 @@ export class AdminVideosComponent {
         this.loading = false;
         this.videos = this.videos.filter(x => x.id !== id);
         this.success('تم حذف الفيديو');
+        this.toastr.success('تم حذف الفيديو بنجاح');
       },
       error: (err) => {
         this.loading = false;
@@ -140,7 +144,7 @@ export class AdminVideosComponent {
     const msg = this.errorHandler.getErrorMessage(err);
     this.errorMsg = msg;
     this.successMsg = '';
-    this.errorHandler.showError(err);
+    this.toastr.error(msg, 'خطأ');
   }
 
   private success(msg: string) {

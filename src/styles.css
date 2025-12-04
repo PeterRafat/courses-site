@@ -21,6 +21,10 @@ body {
   background-color: var(--bg-soft);
   color: var(--text-strong);
   animation: fadeIn 0.5s ease-in;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Slightly smaller base font for a denser, cleaner layout */
@@ -28,15 +32,44 @@ html, body {
   font-size: 14px;
 }
 
+/* Make app-root flex to push footer to bottom */
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Navbar stays fixed/sticky */
+app-root > nav {
+  flex-shrink: 0;
+}
+
+/* Main content grows to fill available space */
+app-root > .main-content-wrapper {
+  flex: 1 0 auto;
+}
+
+/* Footer should stay at bottom */
+app-root > app-footer {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
 /* For larger screens keep a top offset for content so the sticky navbar doesn't overlap it.
-   Footer is not fixed so we only need a small bottom padding. */
+   Footer gets padding-top for spacing before it. */
 @media (min-width: 768px) {
   nav.navbar + .container {
     padding-top: var(--navbar-height);
-    padding-bottom: 1rem;
+    padding-bottom: 2rem;
   }
   .admin-container {
-    padding-bottom: 1rem;
+    padding-bottom: 2rem;
+  }
+  
+  /* Add top padding before footer across all pages */
+  footer.footer-dark {
+    margin-top: 3rem;
+    padding-top: 2rem;
   }
 }
 @keyframes fadeIn {
@@ -55,19 +88,36 @@ html, body {
   top: 0;
   z-index: 1060;
   background: white;
+  min-height: 56px;
 }
+
 .navbar .navbar-brand {
   font-weight: 700;
   color: var(--primary);
   transition: all 0.3s ease;
+  padding: 0.25rem 0;
+  display: flex;
+  align-items: center;
 }
+
 .navbar .navbar-brand:hover {
   transform: scale(1.05);
 }
+
+.navbar-logo {
+  width: 80px;
+  height: 60px;
+  object-fit: contain;
+  max-width: 100%;
+}
+
 .navbar .nav-link {
   transition: all 0.3s ease;
   position: relative;
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
 }
+
 .navbar .nav-link::after {
   content: '';
   position: absolute;
@@ -78,12 +128,73 @@ html, body {
   background-color: var(--primary);
   transition: width 0.3s ease;
 }
+
 .navbar .nav-link.active::after,
 .navbar .nav-link:hover::after {
   width: 100%;
 }
+
 .navbar .nav-link.active {
   color: var(--primary) !important;
+}
+
+.navbar-actions {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.navbar-actions .btn {
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* Mobile navbar improvements */
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    background: white;
+    border-top: 1px solid #e9ecef;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .navbar-nav {
+    margin-bottom: 0.5rem;
+  }
+
+  .navbar-nav .nav-item {
+    border-bottom: 1px solid #f1f3f5;
+  }
+
+  .navbar-nav .nav-item:last-child {
+    border-bottom: none;
+  }
+
+  .navbar-nav .nav-link {
+    padding: 0.75rem 1rem;
+    display: block;
+  }
+
+  .navbar-actions {
+    padding-top: 0.5rem;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .navbar-actions .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .navbar-actions .btn:last-child {
+    margin-bottom: 0;
+  }
+}
+
+@media (min-width: 992px) {
+  .navbar-actions {
+    width: auto;
+    margin-top: 0;
+  }
 }
 
 .btn-primary {
@@ -263,7 +374,7 @@ html {
 
 /* Sticky-footer layout: make `app-root` a column flex container so the middle
    container grows and footer stays at the bottom naturally. */
-html, body, app-root {
+html, body {
   height: 100%;
 }
 
@@ -271,9 +382,262 @@ app-root {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  height: 100%;
+}
+
+/* Main content wrapper to push footer to bottom */
+.main-content-wrapper {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 /* Let the main content area grow so footer is pushed to bottom when needed */
-app-root > .container {
+app-root > .container,
+.main-content-wrapper {
   flex: 1 1 auto;
+}
+
+/* ============ Responsive Design ============ */
+/* تصميم متجاوب لجميع الشاشات */
+
+/* Base responsive container */
+.container {
+  width: 100%;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* Make wide sections horizontally scrollable */
+.table-responsive,
+.admin-card-body,
+.admin-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+}
+
+.table-responsive::-webkit-scrollbar,
+.admin-card-body::-webkit-scrollbar,
+.admin-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track,
+.admin-card-body::-webkit-scrollbar-track,
+.admin-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb,
+.admin-card-body::-webkit-scrollbar-thumb,
+.admin-container::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.5);
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover,
+.admin-card-body::-webkit-scrollbar-thumb:hover,
+.admin-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7);
+}
+
+/* Responsive breakpoints */
+/* Extra small devices (phones, less than 576px) */
+@media (max-width: 575.98px) {
+  html, body {
+    font-size: 13px;
+  }
+
+  .container,
+  .container-fluid {
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+  }
+
+  .navbar-logo {
+    width: 60px;
+    height: 45px;
+  }
+
+  .navbar-toggler {
+    padding: 0.25rem 0.5rem;
+    font-size: 1rem;
+  }
+
+  .navbar-nav {
+    text-align: right;
+  }
+
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .d-flex.gap-2 {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .card {
+    margin-bottom: 1rem;
+  }
+
+  .card-body {
+    padding: 1rem 0.75rem;
+  }
+
+  .table {
+    font-size: 0.75rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.4rem 0.25rem;
+    white-space: nowrap;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+
+  .container.my-4,
+  .container-fluid.py-3,
+  .container-fluid.py-4 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .container {
+    max-width: 540px;
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .container {
+    max-width: 720px;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+/* Responsive images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive video player */
+.player {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.player iframe,
+.player video {
+  width: 100%;
+  height: auto;
+}
+
+/* Responsive forms */
+@media (max-width: 767.98px) {
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .row > * {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .admin-form-group {
+    margin-bottom: 1rem;
+  }
+
+  .admin-card-footer {
+    flex-direction: column;
+  }
+
+  .admin-card-footer .admin-btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Ensure all content is visible on mobile */
+@media (max-width: 767.98px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  * {
+    max-width: 100%;
+  }
+
+  .container,
+  .container-fluid {
+    overflow-x: hidden;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }

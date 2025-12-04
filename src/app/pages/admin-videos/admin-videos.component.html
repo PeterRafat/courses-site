@@ -89,6 +89,13 @@
         <div class="admin-card-footer d-flex justify-content-end">
           <button class="admin-btn admin-btn-secondary" type="submit" [disabled]="form.invalid || loading">إضافة فيديو</button>
         </div>
+        
+        <!-- Loading animation for video upload -->
+        <div *ngIf="loading" class="admin-upload-loading">
+          <div class="admin-spinner"></div>
+          <p class="admin-upload-text">جاري رفع الفيديو... يرجى الانتظار</p>
+          <p class="admin-upload-subtext">قد يستغرق هذا بعض الوقت حسب حجم الملف</p>
+        </div>
       </form>
     </div>
   </div>
@@ -111,7 +118,10 @@
             </div>
           </div>
           <div class="admin-card-footer d-flex gap-2">
-            <button class="admin-btn admin-btn-primary" (click)="updateVideo(v)" [disabled]="loading">تحديث</button>
+            <button class="admin-btn admin-btn-primary" (click)="updateVideo(v)" [disabled]="loading" [class.admin-btn-loading]="loading">
+              <span *ngIf="loading; else updateText">جاري التحديث...</span>
+              <ng-template #updateText>تحديث</ng-template>
+            </button>
             <button class="admin-btn admin-btn-danger" (click)="deleteVideo(v.id)" [disabled]="loading" [class.admin-btn-loading]="loading">
               <span *ngIf="loading; else deleteText">جاري الحذف...</span>
               <ng-template #deleteText>حذف</ng-template>

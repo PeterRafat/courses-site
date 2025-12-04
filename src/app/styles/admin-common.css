@@ -46,11 +46,39 @@
   box-shadow: var(--admin-card-shadow);
   margin-bottom: 1rem;
   display: flex;
+  flex-direction: row;
   align-items: center;
+  justify-content: flex-start;
   gap: 0.4rem;
   flex-wrap: nowrap;
   overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.5) rgba(241, 241, 241, 0.3);
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+}
+
+.admin-nav-tabs::-webkit-scrollbar {
+  height: 8px;
+  display: block;
+}
+
+.admin-nav-tabs::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+  margin: 0 0.4rem;
+}
+
+.admin-nav-tabs::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.6);
+  border-radius: 4px;
+}
+
+.admin-nav-tabs::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.8);
 }
 
 .admin-nav-tabs a {
@@ -69,6 +97,7 @@
   justify-content: center;
   gap: 0.4rem;
   line-height: 1.2;
+  flex-shrink: 0;
 }
 
 .admin-nav-tabs a:hover {
@@ -504,24 +533,225 @@
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
 }
 
-@media (max-width: 768px) {
+/* ============ Responsive Design ============ */
+/* Extra small devices (phones, less than 576px) */
+@media (max-width: 575.98px) {
+  .admin-container {
+    padding: 0 0.5rem;
+  }
+
+  .admin-header {
+    padding: 0.5rem 0;
+  }
+
+  .admin-header-title {
+    font-size: 1.2rem;
+    flex-wrap: wrap;
+  }
+
+  .admin-nav-tabs {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding: 0.4rem;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: auto;
+    scrollbar-color: rgba(99, 102, 241, 0.7) #f1f1f1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .admin-nav-tabs::-webkit-scrollbar {
+    height: 10px;
+    display: block !important;
+  }
+
+  .admin-nav-tabs::-webkit-scrollbar-track {
+    background: #e9ecef;
+    border-radius: 5px;
+    margin: 0 0.2rem;
+  }
+
+  .admin-nav-tabs::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.7);
+    border-radius: 5px;
+    border: 1px solid #e9ecef;
+  }
+
+  .admin-nav-tabs::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.9);
+  }
+
+  .admin-nav-tabs a {
+    min-width: 110px;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .admin-card-body {
+    padding: 0.5rem;
+  }
+
+  .admin-card-header {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .admin-card-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .admin-card-footer .admin-btn {
+    width: 100%;
+  }
+
+  .admin-form-control,
+  .admin-form-select {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .admin-btn {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .admin-grid,
+  .admin-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .admin-alert {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .admin-container {
+    padding: 0 0.75rem;
+  }
+
+  .admin-header-title {
+    font-size: 1.3rem;
+  }
+
+  .admin-nav-tabs {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .admin-nav-tabs a {
+    min-width: 120px;
+    padding: 0.55rem 0.8rem;
+    flex-shrink: 0;
+  }
+
+  .admin-card-body {
+    padding: 0.6rem;
+  }
+
   .admin-grid,
   .admin-grid-2 {
     grid-template-columns: 1fr;
   }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .admin-container {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+
+  .admin-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  .admin-grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
 
   .admin-nav-tabs {
-    /* keep tabs horizontally scrollable on small screens */
+    flex-direction: row;
     flex-wrap: nowrap;
-    padding: 0.25rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  .admin-container {
+    max-width: 1200px;
+  }
+}
+
+/* Horizontal scroll for wide tables and sections */
+.table-responsive,
+.admin-card-body > .table,
+.admin-card-body > table {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  display: block;
+  width: 100%;
+}
+
+.table-responsive table,
+.admin-card-body > .table,
+.admin-card-body > table {
+  width: 100%;
+  min-width: 600px;
+}
+
+/* Ensure wide content sections are scrollable */
+.admin-card-body {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Responsive form layouts */
+@media (max-width: 767.98px) {
+  .row.admin-gap-3,
+  .row.admin-gap-2 {
+    flex-direction: column;
   }
 
-  .admin-nav-tabs a {
-    min-width: 140px;
+  .row.admin-gap-3 > *,
+  .row.admin-gap-2 > * {
+    width: 100%;
+    margin-bottom: 1rem;
   }
 
-  .admin-header-title {
-    font-size: 1.5rem;
+  .admin-form-check-inline {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+  }
+
+  .admin-courses-form-check-inline {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 0.75rem;
   }
 }
 

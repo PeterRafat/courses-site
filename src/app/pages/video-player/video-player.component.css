@@ -30,6 +30,13 @@
   text-align: center;
 }
 
+/* Success message is now at top of page, not in player */
+.alert-success {
+  border-color: #198754;
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
 /* Loading spinner */
 .spinner-border {
   width: 3rem;
@@ -51,4 +58,9 @@
     font-size: 0.8rem;
     padding-left: 1rem;
   }
+}
+
+.alert-success i {
+  font-size: 1.2rem;
+  vertical-align: middle;
 }
