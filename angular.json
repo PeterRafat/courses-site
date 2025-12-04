@@ -36,7 +36,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/manifest.webmanifest"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.rtl.min.css",
@@ -58,25 +59,17 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "8kb",
+                  "maximumError": "10kb"
                 }
               ],
               "outputHashing": "all",
-              "buildOptimizer": true,
               "optimization": true,
-              "vendorChunk": true,
-              "extractLicenses": true,
               "sourceMap": false,
               "namedChunks": false,
               "aot": true,
-              "extractCss": true,
-              "commonChunk": true,
-              "deleteOutputPath": true,
-              "vendorChunk": true,
-              "buildOptimizer": true,
-              "serviceWorker": true,
-              "ngswConfigPath": "ngsw-config.json"
+              "extractLicenses": true,
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "optimization": false,

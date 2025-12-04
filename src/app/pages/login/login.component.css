@@ -5,7 +5,7 @@
 }
 
 :root{
-  --auth-hero-start:#5b21b6; /* stronger purple */
+  --auth-hero-start:#5b21b6;
   --auth-hero-end:#7c3aed;
   --auth-accent:#8b5cf6;
 }
@@ -131,7 +131,6 @@
 .auth-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.06),rgba(0,0,0,0.06));pointer-events:none}
 .auth-hero h1{font-size:2.2rem;margin:0;text-align:center;font-weight:800;text-shadow:0 6px 24px rgba(0,0,0,0.18)}
 .auth-hero p{max-width:80%;opacity:0.95;text-align:center;font-size:1.1rem;line-height:1.6}
-.hero-figure{width:200px;height:200px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.18),rgba(255,255,255,0.06));box-shadow:inset 0 8px 20px rgba(255,255,255,0.04)}
 .auth-right{
   background-color: #8b5cf6;
   border-radius: 10px;
