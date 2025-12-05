@@ -19,7 +19,7 @@ export class CourseDetailComponent {
   quizzes: Quiz[] = [];
   attempts: SubmitQuizResult[] = [];
   canAccess = false;
-  adminWhatsapp = '201287836186';
+  adminWhatsapp = '201006127934';
   whatsAppLink = '';
 
   constructor(private route: ActivatedRoute, private courses: CoursesService, private quizzesSvc: QuizzesService, private userCourses: UserCoursesService) {
