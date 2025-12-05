@@ -38,3 +38,23 @@
   .hero-subtitle{font-size:1rem}
   .hero-actions{flex-direction:column}
 }
+
+.about-contact {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: white;
+}
+
+.about-contact .btn-success {
+  background: #fff;
+  border-color: #fff;
+  color: #25D366;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.about-contact .btn-success:hover {
+  background: #f8f9fa;
+  border-color: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
