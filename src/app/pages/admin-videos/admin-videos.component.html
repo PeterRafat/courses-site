@@ -69,6 +69,7 @@
         <div *ngIf="sourceType==='file'" class="admin-form-group mb-3">
           <label class="admin-form-label">ملف الفيديو</label>
           <input class="form-control admin-form-control" type="file" accept="video/*" (change)="onVideoSelected($event)" />
+          <small class="form-text text-muted">ملاحظة: قد تستغرق عملية رفع مقاطع الفيديو الكبيرة بعض الوقت. يُنصح بضغط الفيديو قبل الرفع لتقليل وقت المعالجة.</small>
         </div>
 
         <div class="row admin-gap-3">

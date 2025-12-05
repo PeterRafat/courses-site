@@ -218,6 +218,13 @@ export class AdminService {
             duration: d?.duration ?? params.duration,
             orderIndex: d?.orderIndex ?? params.orderIndex
           } as CourseVideo;
+        }),
+        catchError((error) => {
+          // Handle timeout errors specifically for video uploads
+          if (error.name === 'TimeoutError' || (error.status === 0 && error.statusText === 'Unknown Error')) {
+            throw new Error('انتهت مهلة رفع الفيديو. قد يكون الفيديو كبيرًا جدًا أو يوجد مشكلة في الشبكة. يرجى المحاولة مرة أخرى.');
+          }
+          throw error;
         })
       );
   }

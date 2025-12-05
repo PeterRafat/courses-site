@@ -15,6 +15,9 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   // Check if this is a FormData request
   const isFormData = req.body instanceof FormData;
   
+  // Check if this is a video upload request
+  const isVideoUpload = req.url.includes('/admin/videos/upload');
+  
   // Add common headers for API requests, but not for FormData
   let headers: { [key: string]: string } = {};
   
@@ -41,9 +44,12 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
     setHeaders: headers
   });
   
+  // Set timeout - longer timeout for video uploads
+  const requestTimeout = isVideoUpload ? 120000 : 10000; // 120 seconds for video uploads, 10 seconds for others
+  
   return next(req).pipe(
     // Add timeout for better user experience
-    timeout(10000), // 10 second timeout
+    timeout(requestTimeout),
     // Add caching for GET requests
     req.method === 'GET' ? shareReplay(1, 300000) : tap(() => {}), // Cache for 5 minutes
     catchError((error) => {

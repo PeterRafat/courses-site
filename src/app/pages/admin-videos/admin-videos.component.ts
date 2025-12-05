@@ -63,6 +63,8 @@ export class AdminVideosComponent {
       });
     } else {
       if (!this.videoFile) { this.setError({ message: 'يجب اختيار ملف فيديو' }); return; }
+      // Show a message indicating that video upload may take some time
+      this.toastr.info('جارٍ رفع الفيديو... قد يستغرق هذا بعض الوقت حسب حجم الملف', 'معلومة');
       this.admin.uploadVideo({ courseId, videoTitle, duration, orderIndex }, this.videoFile).subscribe({
         next: (created) => { 
           this.loading = false; 
@@ -71,7 +73,13 @@ export class AdminVideosComponent {
           this.refreshVideos(courseId);
           this.resetForm(); 
         },
-        error: err => this.setError(err)
+        error: err => {
+          this.setError(err);
+          // Show additional error message for timeout issues
+          if (err.message && err.message.includes('انتهت مهلة')) {
+            this.toastr.error('يرجى المحاولة مرة أخرى مع فيديو أصغر حجمًا أو التحقق من سرعة الإنترنت', 'مشكلة في رفع الفيديو');
+          }
+        }
       });
     }
   }
