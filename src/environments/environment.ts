@@ -2,7 +2,6 @@
 // Local development URLs: https://localhost:7000
 export const environment = {
   production: false,
-  apiBaseUrl: 'https://mahmoudsalama8-001-site1.ktempurl.com/api',
-  videoBaseUrl: 'https://mahmoudsalama8-001-site1.ktempurl.com'
+  apiBaseUrl: 'https://mahmoudsalama1-001-site1.qtempurl.com/api',
+  videoBaseUrl: 'https://mahmoudsalama1-001-site1.qtempurl.com'
 };
-// https://mahmoudsalama8-001-site1.ktempurl.com
