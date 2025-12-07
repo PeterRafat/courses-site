@@ -21,5 +21,6 @@ export const routes: Routes = [
   { path: 'admin/videos', loadComponent: () => import('./pages/admin-videos/admin-videos.component').then(m => m.AdminVideosComponent), canActivate: [adminGuard] },
   { path: 'admin/quizzes', loadComponent: () => import('./pages/admin-quizzes/admin-quizzes.component').then(m => m.AdminQuizzesComponent), canActivate: [adminGuard] },
   { path: 'admin/assign', loadComponent: () => import('./pages/admin-assign/admin-assign.component').then(m => m.AdminAssignComponent), canActivate: [adminGuard] },
+  { path: 'admin/contact', loadComponent: () => import('./pages/admin-contact/admin-contact.component').then(m => m.AdminContactComponent), canActivate: [adminGuard] },
   { path: '**', component: NotFoundComponent }
 ];

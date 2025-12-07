@@ -1,0 +1,127 @@
+<div class="admin-container">
+  <div class="admin-header d-flex justify-content-between align-items-center mb-4">
+    <h2>نماذج التواصل</h2>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="admin-nav-tabs">
+    <a routerLink="/admin/courses" routerLinkActive="active">
+      <i class="bi bi-book"></i> الكورسات
+    </a>
+    <a routerLink="/admin/videos" routerLinkActive="active">
+      <i class="bi bi-camera-video"></i> الفيديوهات
+    </a>
+    <a routerLink="/admin/quizzes" routerLinkActive="active">
+      <i class="bi bi-patch-question"></i> الكويزات
+    </a>
+    <a routerLink="/admin/assign" routerLinkActive="active">
+      <i class="bi bi-person-plus"></i> تعيين كورس
+    </a>
+    <a routerLink="/admin/contact" routerLinkActive="active" class="active">
+      <i class="bi bi-envelope"></i> نماذج التواصل
+    </a>
+  </div>
+
+  <div class="admin-card">
+    <div class="admin-card-header">
+      <i class="bi bi-envelope admin-card-header-icon"></i>
+      قائمة نماذج التواصل
+    </div>
+    <div class="admin-card-body">
+      <!-- Loading indicator -->
+      <div *ngIf="loading" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">جاري التحميل...</span>
+        </div>
+        <p class="mt-2">جاري تحميل نماذج التواصل...</p>
+      </div>
+
+      <!-- Contacts table -->
+      <div *ngIf="!loading && contacts.length > 0" class="table-responsive">
+        <table class="table table-bordered table-striped table-hover">
+          <thead>
+            <tr>
+              <th>الاسم</th>
+              <th>البريد الإلكتروني</th>
+              <th>رقم الهاتف</th>
+              <th>التاريخ</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let contact of contacts">
+              <td>{{ contact.name }}</td>
+              <td>{{ contact.email }}</td>
+              <td class="phone-number-ltr">{{ contact.number }}</td>
+              <td>{{ formatDate(contact.createdAt) }}</td>
+              <td class="table-actions">
+                <button class="btn btn-sm btn-primary me-2" (click)="viewContactDetails(contact.id)">
+                  <i class="bi bi-eye"></i> عرض
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="deleteContact(contact.id)">
+                  <i class="bi bi-trash"></i> حذف
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No contacts message -->
+      <div *ngIf="!loading && contacts.length === 0" class="text-center py-5">
+        <i class="bi bi-envelope fs-1 text-muted mb-3"></i>
+        <h5 class="text-muted">لا توجد نماذج تواصل حتى الآن</h5>
+        <p class="text-muted">سيظهر هنا جميع نماذج التواصل التي يتم إرسالها من المستخدمين</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Contact Details Modal -->
+<div class="modal" [ngClass]="{ 'show d-block': showDetailsModal }" id="contactDetailsModal" tabindex="-1" 
+     aria-labelledby="contactDetailsModalLabel" aria-hidden="true" *ngIf="showDetailsModal">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="contactDetailsModalLabel">تفاصيل نموذج التواصل</h5>
+        <button type="button" class="btn-close" (click)="closeDetailsModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedContact">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label fw-bold">الاسم:</label>
+              <p class="form-control-plaintext">{{ selectedContact.name }}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label fw-bold">رقم الهاتف:</label>
+              <p class="form-control-plaintext phone-number-ltr">{{ selectedContact.number }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">البريد الإلكتروني:</label>
+          <p class="form-control-plaintext">{{ selectedContact.email }}</p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">تاريخ الإرسال:</label>
+          <p class="form-control-plaintext">{{ formatDate(selectedContact.createdAt) }}</p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">الرسالة:</label>
+          <div class="form-control bg-light p-3">
+            {{ selectedContact.text }}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDetailsModal()">إغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal backdrop -->
+<div *ngIf="showDetailsModal" class="modal-backdrop show" style="transition: none;"></div>

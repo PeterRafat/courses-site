@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, catchError } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Course, CourseVideo, Quiz, User, Question, Answer } from '../models/entities';
+import { Course, CourseVideo, Quiz, User, Question, Answer, ContactForm, ContactFormCreate } from '../models/entities';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -431,6 +431,76 @@ export class AdminService {
           console.error('getUsers error', err);
           // Return empty array instead of throwing error to prevent app crash
           return of([]);
+        })
+      );
+  }
+
+  // Contact Form Methods
+  getContactForms(): Observable<ContactForm[]> {
+    return this.http
+      .get<{ success: boolean; message: string; data: any[]; errors: string[] }>(`${this.baseUrl}/admin/contact`)
+      .pipe(
+        map(res => (res?.data ?? []).map(item => ({
+          id: item.id ?? 0,
+          name: item.name ?? '',
+          email: item.email ?? '',
+          number: item.number ?? '',
+          text: item.text ?? '',
+          createdAt: item.createdAt ?? new Date().toISOString()
+        } as ContactForm))),
+        catchError((err: any) => {
+          console.error('getContactForms error', err);
+          return of([]);
+        })
+      );
+  }
+
+  getContactForm(id: number): Observable<ContactForm> {
+    return this.http
+      .get<{ success: boolean; message: string; data: any; errors: string[] }>(`${this.baseUrl}/admin/contact/${id}`)
+      .pipe(
+        map(res => ({
+          id: res?.data?.id ?? 0,
+          name: res?.data?.name ?? '',
+          email: res?.data?.email ?? '',
+          number: res?.data?.number ?? '',
+          text: res?.data?.text ?? '',
+          createdAt: res?.data?.createdAt ?? new Date().toISOString()
+        } as ContactForm)),
+        catchError((err: any) => {
+          console.error('getContactForm error', err);
+          throw err;
+        })
+      );
+  }
+
+  deleteContactForm(id: number): Observable<string> {
+    return this.http
+      .delete<{ success: boolean; message: string; data: string; errors: string[] }>(`${this.baseUrl}/admin/contact/${id}`)
+      .pipe(
+        map(res => res?.data ?? 'deleted'),
+        catchError((err: any) => {
+          console.error('deleteContactForm error', err);
+          throw err;
+        })
+      );
+  }
+
+  submitContactForm(form: ContactFormCreate): Observable<ContactForm> {
+    return this.http
+      .post<{ success: boolean; message: string; data: any; errors: string[] }>(`${this.baseUrl}/Contact`, form)
+      .pipe(
+        map(res => ({
+          id: res?.data?.id ?? 0,
+          name: res?.data?.name ?? form.name,
+          email: res?.data?.email ?? form.email,
+          number: res?.data?.number ?? form.number,
+          text: res?.data?.text ?? form.text,
+          createdAt: res?.data?.createdAt ?? new Date().toISOString()
+        } as ContactForm)),
+        catchError((err: any) => {
+          console.error('submitContactForm error', err);
+          throw err;
         })
       );
   }

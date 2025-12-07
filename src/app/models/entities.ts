@@ -84,3 +84,19 @@ export interface UserQuizAttempt {
   correctAnswers: number;
   isPassed: boolean;
 }
+
+export interface ContactForm {
+  id: number;
+  name: string;
+  email: string;
+  number: string;
+  text: string;
+  createdAt: string;
+}
+
+export interface ContactFormCreate {
+  name: string;
+  email: string;
+  number: string;
+  text: string;
+}

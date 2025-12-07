@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { NgForOf, NgIf } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import { CoursesService } from '../../services/courses.service';
 import { QuizzesService } from '../../services/quizzes.service';
@@ -9,7 +10,7 @@ import { User, Course, Quiz, Question } from '../../models/entities';
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [ReactiveFormsModule, NgForOf, NgIf],
+  imports: [ReactiveFormsModule, NgForOf, NgIf, RouterLink],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })

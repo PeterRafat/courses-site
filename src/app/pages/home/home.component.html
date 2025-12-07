@@ -113,12 +113,43 @@
 </section>
 
 <section class="container py-5 bg-light rounded-3 my-4">
-  <div class="row align-items-center">
-    <div class="col-md-8">
+  <div class="row">
+    <div class="col-12">
       <h3 class="section-title mb-3">هل لديك أي استفسارات؟</h3>
-    </div>
-    <div class="col-md-4 text-md-end mt-3 mt-md-0">
-     
+      <p class="text-muted mb-4">املأ النموذج أدناه وسنتواصل معك في أقرب وقت ممكن</p>
+      
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <form (ngSubmit)="submitContactForm()" #contactForm="ngForm">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="name" class="form-label">الاسم الكامل *</label>
+                <input type="text" class="form-control" id="name" name="name" [(ngModel)]="contactFormModel.name" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="email" class="form-label">البريد الإلكتروني *</label>
+                <input type="email" class="form-control" id="email" name="email" [(ngModel)]="contactFormModel.email" required>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="number" class="form-label">رقم الهاتف *</label>
+                <input type="tel" class="form-control" id="number" name="number" [(ngModel)]="contactFormModel.number" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="text" class="form-label">رسالتك *</label>
+              <textarea class="form-control" id="text" name="text" rows="4" [(ngModel)]="contactFormModel.text" required></textarea>
+            </div>
+            <div class="d-flex justify-content-end">
+              <button type="submit" class="btn btn-primary" [disabled]="contactForm.invalid || isSubmitting">
+                <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {{ isSubmitting ? 'جاري الإرسال...' : 'إرسال الرسالة' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </section>
