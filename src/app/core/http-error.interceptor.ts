@@ -45,7 +45,7 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   });
   
   // Set timeout - longer timeout for video uploads
-  const requestTimeout = isVideoUpload ? 120000 : 10000; // 120 seconds for video uploads, 10 seconds for others
+  const requestTimeout = isVideoUpload ? 200000 : 100000; // 120 seconds for video uploads, 10 seconds for others
   
   return next(req).pipe(
     // Add timeout for better user experience
