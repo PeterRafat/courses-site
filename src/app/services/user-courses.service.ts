@@ -170,5 +170,24 @@ export class UserCoursesService {
       map((progress) => progress !== null && progress.isActive)
     );
   }
+  
+  /**
+   * Enroll user in a free course
+   */
+  enrollInCourse(courseId: number): Observable<any> {
+    return this.http
+      .post<{ success: boolean; message: string; data: any; errors: string[] }>(
+        `${this.baseUrl}/user-courses/enroll/${courseId}`,
+        {},
+        { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }
+      )
+      .pipe(
+        map(res => res),
+        catchError((err) => {
+          console.error('Error enrolling in course:', err);
+          return throwError(() => err);
+        })
+      );
+  }
 }
 

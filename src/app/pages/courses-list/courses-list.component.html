@@ -21,7 +21,7 @@
             <span class="badge" [class.bg-success]="c.isFree" [class.bg-primary]="!c.isFree">{{ c.isFree ? 'مجاني' : 'مدفوع' }}</span>
             <span *ngIf="!c.isFree && accessible.has(c.courseId)" class="badge bg-success">لديك وصول</span>
           </div>
-          <a class="btn btn-primary btn-sm" [routerLink]="['/courses', c.courseId]">تفاصيل</a>
+          <button class="btn btn-sm" [class]="accessible.has(c.courseId) ? 'btn-success' : (c.isFree ? 'btn-primary' : 'btn-primary')" (click)="onButtonClick(c)">{{ getButtonLabel(c) }}</button>
         </div>
       </div>
     </div>
