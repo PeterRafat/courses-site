@@ -53,16 +53,19 @@ export class QuizzesService {
 
   getQuiz(quizId: number): Observable<Quiz> {
     return this.http.get<Quiz>(`${this.baseUrl}/quizzes/${quizId}`).pipe(
-      catchError(err => { this.errorHandler.showError(err, 'فشل تحميل الكويز'); return of({
-        quizId,
-        courseId: 0,
-        quizTitle: 'غير متاح',
-        description: '',
-        totalQuestions: 0,
-        passingScore: 0,
-        timeLimit: 0,
-        isActive: false
-      } as Quiz); })
+      catchError(err => { 
+        console.log(`Quiz ${quizId} not found, returning default quiz object`);
+        return of({
+          quizId: 0,
+          courseId: 0,
+          quizTitle: 'غير متاح',
+          description: '',
+          totalQuestions: 0,
+          passingScore: 0,
+          timeLimit: 0,
+          isActive: false
+        } as Quiz); 
+      })
     );
   }
 

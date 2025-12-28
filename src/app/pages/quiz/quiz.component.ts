@@ -3,9 +3,10 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgIf, NgForOf } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { QuizzesService, StartQuizData, SubmitQuizRequest, SubmitQuizResult } from '../../services/quizzes.service';
+import { AuthService } from '../../services/auth.service';
 import { ErrorHandlerService } from '../../core/error-handler.service';
 import { ToastrService } from 'ngx-toastr';
-import { Quiz } from '../../models/entities';
+import { Quiz, User } from '../../models/entities';
 
 @Component({
   selector: 'app-quiz',
@@ -25,33 +26,57 @@ export class QuizComponent implements OnDestroy {
   timerInterval: any;
   quizSubmitted = false;
 
-  constructor(private route: ActivatedRoute, private router: Router, private quizzes: QuizzesService, private fb: FormBuilder, private errHandler: ErrorHandlerService, private toastr: ToastrService) {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (!id || isNaN(id)) {
-      this.errorMsg = 'معرف الكويز غير صالح';
-      this.loading = false;
-      return;
-    }
-    
-    this.quizzes.startQuiz(id).subscribe({
-      next: data => {
-        this.startData = data;
-        this.quiz = { quizId: data.quizId, courseId: 0, quizTitle: data.quizTitle, description: '', totalQuestions: data.questions.length, passingScore: 0, timeLimit: data.timeLimit, isActive: true } as Quiz;
-        const controls: any = {};
-        // questionType mapping: 0 = multiple choice (single answer), 1 = true/false
-        // both types use a single selected value (radio). Initialize controls to null.
-        data.questions.forEach(q => { controls['q_' + q.id] = this.fb.control(null); });
-        this.form = this.fb.group(controls);
-        this.timeRemaining = data.timeLimit * 60;
-        this.startTimer();
+  currentUser?: User;
+  
+  constructor(private route: ActivatedRoute, private router: Router, private quizzes: QuizzesService, private fb: FormBuilder, private errHandler: ErrorHandlerService, private toastr: ToastrService, private authService: AuthService) {
+    // Load current user first
+    this.authService.me().subscribe(user => {
+      this.currentUser = user;
+      console.log('Current user loaded:', user);
+      
+      const id = Number(this.route.snapshot.paramMap.get('id'));
+      if (!id || isNaN(id)) {
+        this.errorMsg = 'معرف الكويز غير صالح';
         this.loading = false;
-      },
-      error: (err) => {
-        this.loading = false;
-        const msg = this.errHandler.getErrorMessage(err);
-        this.errorMsg = msg;
-        this.toastr.error(msg);
+        return;
       }
+      
+      // Directly start the quiz to get both quiz details and questions
+      this.quizzes.startQuiz(id).subscribe({
+        next: data => {
+          // Create a quiz object from the start data
+          this.quiz = {
+            quizId: data.quizId,
+            courseId: 0, // We'll need to get this from somewhere else or extract it
+            quizTitle: data.quizTitle,
+            description: '',
+            totalQuestions: data.questions.length,
+            passingScore: 0, // We'll need to get this from somewhere else
+            timeLimit: data.timeLimit,
+            isActive: true
+          };
+          
+          this.startData = data;
+          const controls: any = {};
+          // questionType mapping: 0 = multiple choice (single answer), 1 = true/false
+          // both types use a single selected value (radio). Initialize controls to null.
+          data.questions.forEach(q => { controls['q_' + q.id] = this.fb.control(null); });
+          this.form = this.fb.group(controls);
+          this.timeRemaining = data.timeLimit * 60;
+          this.startTimer();
+          this.loading = false;
+        },
+        error: (err) => {
+          this.loading = false;
+          const msg = this.errHandler.getErrorMessage(err);
+          this.errorMsg = msg;
+          // Handle specific case when quiz is not found
+          if (err.status === 404) {
+            this.errorMsg = 'الكويز غير متوفر أو تم حذفه';
+          }
+          this.toastr.error(msg);
+        }
+      });
     });
   }
 
@@ -76,6 +101,11 @@ export class QuizComponent implements OnDestroy {
       next: res => { 
         this.result = res; 
         this.toastr.success('تم إرسال الإجابات بنجاح');
+        
+        // Mark quiz as passed if successful
+        if (res.isPassed) {
+          this.markQuizAsPassed(res.quizId);
+        }
       },
       error: err => { 
         this.quizSubmitted = false;
@@ -127,6 +157,27 @@ export class QuizComponent implements OnDestroy {
     if (this.quiz?.quizId) {
       this.router.navigate(['/quizzes', this.quiz.quizId]);
       window.location.reload();
+    }
+  }
+
+  /**
+   * Mark quiz as passed in localStorage
+   */
+  markQuizAsPassed(quizId: number) {
+    try {
+      // Get course ID from quiz object
+      const courseId = this.quiz?.courseId;
+      const userId = this.currentUser?.userId || 0;
+      if (courseId) {
+        const passedQuizzesKey = `user_${userId}_course_${courseId}_passed_quizzes`;
+        const passedQuizzes = JSON.parse(localStorage.getItem(passedQuizzesKey) || '[]');
+        if (!passedQuizzes.includes(quizId)) {
+          passedQuizzes.push(quizId);
+          localStorage.setItem(passedQuizzesKey, JSON.stringify(passedQuizzes));
+        }
+      }
+    } catch (e) {
+      console.error('Error saving passed quiz to localStorage:', e);
     }
   }
 

@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgIf } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CoursesService } from '../../services/courses.service';
-import { CourseVideo } from '../../models/entities';
+import { AuthService } from '../../services/auth.service';
+import { CourseVideo, User } from '../../models/entities';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ErrorHandlerService } from '../../core/error-handler.service';
 import { environment } from '../../../environments/environment.js';
@@ -15,60 +16,70 @@ import { environment } from '../../../environments/environment.js';
   templateUrl: './video-player.component.html',
   styleUrls: ['./video-player.component.css']
 })
-export class VideoPlayerComponent {
+export class VideoPlayerComponent implements OnDestroy {
   video?: CourseVideo;
   embedUrl: SafeResourceUrl | '' = '';
   blobUrl = '';
   errorMsg = '';
   isLoading = true;
 
+  currentUser?: User;
+  
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private courses: CoursesService,
     private http: HttpClient,
     private errorHandler: ErrorHandlerService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private authService: AuthService
   ) {
-    // Clear any previous error messages when component initializes
-    this.errorMsg = '';
-    this.isLoading = true;
-    
-    // Handle Chrome extension errors (runtime.lastError)
-    // معالجة أخطاء إضافات المتصفح
-    this.setupErrorHandling();
-    
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    console.log('Loading video with ID:', id);
-    
-    this.courses.getVideo(id).subscribe({
-      next: v => {
-        this.video = v;
-        console.log('Video data loaded:', v);
-        
-        // Check if it's a YouTube video (has embed URL)
-        if (v.videoUrl && (v.videoUrl.includes('youtube.com') || v.videoUrl.includes('youtu.be'))) {
-          this.handleYouTubeVideo(v.videoUrl);
-        } else {
-          // For local videos, try to load directly first
-          this.handleLocalVideo(v.videoUrl);
+    // Load current user first
+    this.authService.me().subscribe(user => {
+      this.currentUser = user;
+      console.log('Current user loaded:', user);
+      
+      // Clear any previous error messages when component initializes
+      this.errorMsg = '';
+      this.isLoading = true;
+      
+      // Handle Chrome extension errors (runtime.lastError)
+      // معالجة أخطاء إضافات المتصفح
+      this.setupErrorHandling();
+      
+      const id = Number(this.route.snapshot.paramMap.get('id'));
+      console.log('Loading video with ID:', id);
+      
+      this.courses.getVideo(id).subscribe({
+        next: v => {
+          this.video = v;
+          console.log('Video data loaded:', v);
+          
+          // Check if it's a YouTube video (has embed URL)
+          if (v.videoUrl && (v.videoUrl.includes('youtube.com') || v.videoUrl.includes('youtu.be'))) {
+            this.handleYouTubeVideo(v.videoUrl);
+          } else {
+            // For local videos, try to load directly first
+            this.handleLocalVideo(v.videoUrl);
+          }
+        },
+        error: (err) => {
+          // Check if it's a Chrome extension error and ignore it
+          if (this.isChromeExtensionError(err)) {
+            console.log('تم تجاهل خطأ إضافة المتصفح (Chrome extension error)');
+            return;
+          }
+          
+          console.error('Error loading video:', err);
+          this.errorMsg = this.errorHandler.getErrorMessage(err);
+          // Provide a more user-friendly message
+          if (this.errorMsg.includes('فشل تحميل الفيديو')) {
+            this.errorMsg = 'حدث خطأ أثناء تحميل معلومات الفيديو. قد يكون الفيديو غير متوفر حالياً.';
+          }
+          // Removed error alert - user doesn't want alerts
+          this.isLoading = false;
         }
-      },
-      error: (err) => {
-        // Check if it's a Chrome extension error and ignore it
-        if (this.isChromeExtensionError(err)) {
-          console.log('تم تجاهل خطأ إضافة المتصفح (Chrome extension error)');
-          return;
-        }
-        
-        console.error('Error loading video:', err);
-        this.errorMsg = this.errorHandler.getErrorMessage(err);
-        // Provide a more user-friendly message
-        if (this.errorMsg.includes('فشل تحميل الفيديو')) {
-          this.errorMsg = 'حدث خطأ أثناء تحميل معلومات الفيديو. قد يكون الفيديو غير متوفر حالياً.';
-        }
-        // Removed error alert - user doesn't want alerts
-        this.isLoading = false;
-      }
+      });
     });
   }
 
@@ -360,6 +371,29 @@ export class VideoPlayerComponent {
     } catch {
       // Fallback to api origin if videoBaseUrl parsing fails
       return this.getApiOrigin();
+    }
+  }
+
+  //  Mark video as watched when user navigates away from the video page
+   
+  ngOnDestroy() {
+    // Mark video as watched when leaving the page
+    if (this.video && this.video.videoId) {
+      // Store watched video in localStorage
+      const courseId = this.video.courseId;
+      const userId = this.currentUser?.userId || 0;
+      if (courseId) {
+        try {
+          const watchedVideosKey = `user_${userId}_course_${courseId}_watched_videos`;
+          const watchedVideos = JSON.parse(localStorage.getItem(watchedVideosKey) || '[]');
+          if (!watchedVideos.includes(this.video.videoId)) {
+            watchedVideos.push(this.video.videoId);
+            localStorage.setItem(watchedVideosKey, JSON.stringify(watchedVideos));
+          }
+        } catch (e) {
+          console.error('Error saving watched video to localStorage:', e);
+        }
+      }
     }
   }
 }

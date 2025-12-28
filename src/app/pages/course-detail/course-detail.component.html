@@ -19,6 +19,37 @@
     </div>
   </div>
 
+  <!-- Progress Bar -->
+  <div class="card mt-3 p-3 border-0 shadow-sm">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="mb-0">تقدم الكورس</h5>
+      <span class="fw-bold">{{ completionPercentage }}%</span>
+    </div>
+    <div class="progress" style="height: 20px;">
+      <div class="progress-bar" 
+           [class.progress-bar-success]="completionPercentage === 100"
+           [class.progress-bar-striped]="completionPercentage < 100"
+           [style.width.%]="completionPercentage"
+           role="progressbar" 
+           [attr.aria-valuenow]="completionPercentage" 
+           aria-valuemin="0" 
+           aria-valuemax="100">
+        {{ completionPercentage === 100 ? 'مكتمل' : completionPercentage + '%' }}
+      </div>
+    </div>
+    <div class="mt-2 text-muted small">
+      <i class="bi bi-info-circle"></i> يتم تحديث التقدم تلقائيًا عند مشاهدة الفيديوهات وإكمال الكويزات
+    </div>
+    <!-- Certificate Sent Message -->
+    <div *ngIf="completionPercentage === 100" class="mt-3 alert alert-success d-flex align-items-center" role="alert">
+      <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+      <div>
+        <strong>تهانينا!</strong> لقد أكملت الكورس بنجاح.
+        <p class="mb-0"> سيتم إرسال الشهادة إلى بريدك الإلكتروني في اسرع وقت</p>
+      </div>
+    </div>
+  </div>
+
   <div *ngIf="canAccess; else locked">
     <h4 class="mt-4 section-title">الفيديوهات</h4>
     <ul class="list-group mb-3">
@@ -69,27 +100,37 @@
     </div>
 
     <h4 class="section-title mt-5">سجل محاولاتك</h4>
-    <div *ngIf="attempts.length; else noAttempts" class="row g-3">
-      <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-3" *ngFor="let a of attempts">
-        <div class="attempt-card" [class.attempt-passed]="a.isPassed" [class.attempt-failed]="!a.isPassed">
-          <div class="attempt-badge">
-            <i class="bi" [class.bi-check-circle-fill]="a.isPassed" [class.bi-x-circle-fill]="!a.isPassed"></i>
-          </div>
-          <h5 class="attempt-quiz-title">{{ a.quizTitle || 'كويز' }}</h5>
-          <div class="attempt-score">{{ a.score }}%</div>
-          <div class="attempt-details">
-            <div class="detail-row">
-              <span class="text-success"><i class="bi bi-check-circle"></i> {{ a.correctAnswers }}</span>
-              <span class="text-danger"><i class="bi bi-x-circle"></i> {{ a.totalQuestions - a.correctAnswers }}</span>
-            </div>
-            <div class="detail-row mt-2">
-              <small class="text-muted">{{ a.completedAt | date:'short' }}</small>
-            </div>
-          </div>
-          <div class="attempt-footer">
-            <a class="btn btn-sm btn-outline-primary w-100" [routerLink]="['/quizzes', a.quizId]">
-              <i class="bi bi-arrow-clockwise me-1"></i>محاولة جديدة
-            </a>
+    <div *ngIf="attempts.length; else noAttempts">
+      <div class="card border rounded-3 shadow-sm mx-auto w-100" style="max-width: 1400px;">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="border py-2 px-3 fs-7">اسم الكويز</th>
+                  <th class="border py-2 px-3 fs-7">التاريخ</th>
+                  <th class="border py-2 px-3 fs-7 text-center">عدد الإجابات الصحيحة</th>
+                  <th class="border py-2 px-3 fs-7 text-center">النتيجة</th>
+                  <th class="border py-2 px-3 fs-7 text-center">الحالة</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let a of attempts">
+                  <td class="border py-2 px-3 fs-7">{{ a.quizTitle || 'كويز' }}</td>
+                  <td class="border py-2 px-3 fs-7">{{ a.completedAt | date:'yyyy-MM-dd HH:mm' }}</td>
+                  <td class="border py-2 px-3 fs-7 text-center">{{ a.correctAnswers }}/{{ a.totalQuestions }}</td>
+                  <td class="border py-2 px-3 fs-7 text-center">
+                    <span class="badge fs-7" [class.bg-success]="a.score >= 50" [class.bg-danger]="a.score < 50">
+                      {{ a.score }}%
+                    </span>
+                  </td>
+                  <td class="border py-2 px-3 fs-7 text-center">
+                    <span *ngIf="a.isPassed" class="badge bg-success px-2 py-1">ناجح</span>
+                    <span *ngIf="!a.isPassed" class="badge bg-danger px-2 py-1">راسب</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
