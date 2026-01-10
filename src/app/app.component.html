@@ -347,7 +347,7 @@
 <nav class="navbar navbar-expand-lg bg-white border-bottom">
   <div class="container-fluid px-2 px-md-3">
     <a class="navbar-brand" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-      <img src="logo.png" alt="Logo" class="navbar-logo" loading="lazy" width="80" height="60">
+      <img src="logo.png" alt="Logo" class="navbar-logo" loading="lazy" width="100" height="800">
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -358,7 +358,25 @@
           <a class="nav-link" routerLink="/courses" routerLinkActive="active">الكورسات</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/about" routerLinkActive="active">عن المنصة</a>
+          <a class="nav-link" routerLink="/about" routerLinkActive="active">من نحن</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            الخدمات
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" routerLink="/consulting-services" routerLinkActive="active">الخدمات الاستشارية</a></li>
+            <li><a class="dropdown-item" routerLink="/training-services" routerLinkActive="active">الخدمات التدريبية</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/training-guide" routerLinkActive="active">دليل التدريب</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/join-us" routerLinkActive="active">انضم إلينا</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/contact" routerLinkActive="active">تواصل معنا</a>
         </li>
       </ul>
       <div class="navbar-actions d-flex flex-column flex-lg-row gap-2">

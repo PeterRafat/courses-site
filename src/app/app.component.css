@@ -163,3 +163,25 @@
     height: 40px;
   }
 }
+
+/* Navbar Logo Styling */
+.navbar-logo {
+  width: 120px;
+  height: 70px;
+  object-fit: contain;
+}
+
+/* Responsive adjustments for navbar logo */
+@media (max-width: 768px) {
+  .navbar-logo {
+    width: 100px;
+    height: 80px;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar-logo {
+    width: 80px;
+    height: 60px;
+  }
+}

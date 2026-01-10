@@ -1,0 +1,38 @@
+<div class="container my-5">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="text-center mb-4">تواصل معنا</h1>
+      <p class="text-center lead">نرحب برسائلكم وملاحظاتكم. يرجى ملء النموذج أدناه وسنرد عليكم في أقرب وقت ممكن.</p>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <form #contactForm="ngForm" (ngSubmit)="onSubmit(contactForm)">
+        <div class="mb-3">
+          <label for="name" class="form-label">الاسم</label>
+          <input type="text" class="form-control" id="name" name="name" required [(ngModel)]="formData.name">
+        </div>
+        
+        <div class="mb-3">
+          <label for="email" class="form-label">البريد الإلكتروني</label>
+          <input type="email" class="form-control" id="email" name="email" required [(ngModel)]="formData.email">
+        </div>
+        
+        <div class="mb-3">
+          <label for="subject" class="form-label">الموضوع</label>
+          <input type="text" class="form-control" id="subject" name="subject" required [(ngModel)]="formData.subject">
+        </div>
+        
+        <div class="mb-3">
+          <label for="message" class="form-label">الرسالة</label>
+          <textarea class="form-control" id="message" name="message" rows="5" required [(ngModel)]="formData.message"></textarea>
+        </div>
+        
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary btn-lg">إرسال الرسالة</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

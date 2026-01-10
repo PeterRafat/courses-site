@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ContactService } from '../../services/contact.service';
 import { ContactForm, ContactFormCreate } from '../../models/entities';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-home',
@@ -22,11 +23,11 @@ export class HomeComponent {
   
   isSubmitting = false;
   
-  constructor(private contactService: ContactService) {}
+  constructor(private contactService: ContactService, private toastr: ToastrService) {}
   
   submitContactForm(): void {
     if (!this.contactFormModel.name || !this.contactFormModel.email || !this.contactFormModel.number || !this.contactFormModel.text) {
-      alert('يرجى ملء جميع الحقول المطلوبة');
+      this.toastr.error('يرجى ملء جميع الحقول المطلوبة', 'خطأ');
       return;
     }
     
@@ -35,7 +36,7 @@ export class HomeComponent {
     this.contactService.submitContactForm(this.contactFormModel).subscribe({
       next: (response: ContactForm) => {
         this.isSubmitting = false;
-        alert('تم إرسال رسالتك بنجاح! سنقوم بالتواصل معك في أقرب وقت.');
+        this.toastr.success('تم إرسال رسالتك بنجاح! سنقوم بالتواصل معك في أقرب وقت.', 'نجاح');
         // Reset form
         this.contactFormModel = {
           name: '',
@@ -47,7 +48,7 @@ export class HomeComponent {
       error: (error: any) => {
         this.isSubmitting = false;
         console.error('Error submitting contact form:', error);
-        alert('حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.');
+        this.toastr.error('حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.', 'خطأ');
       }
     });
   }

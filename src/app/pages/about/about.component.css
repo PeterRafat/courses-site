@@ -58,3 +58,87 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
+
+/* New content styles for training center */
+.about-center-info {
+  padding: 4rem 0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
+}
+
+.about-center-info h1 {
+  font-weight: 800;
+  color: #2d3748;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.about-center-info h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+}
+
+.about-center-info .card {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.about-center-info .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.about-center-info .card-header {
+  font-weight: 700;
+  border: none;
+  padding: 1.25rem 1.5rem;
+}
+
+.about-center-info .card-body {
+  padding: 1.5rem;
+}
+
+.about-center-info .card-text {
+  line-height: 1.8;
+  color: #4a5568;
+}
+
+.about-center-info .list-group-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px !important;
+  margin-bottom: 0.5rem;
+  padding: 1rem 1.25rem;
+  background: #fafafa;
+}
+
+.about-center-info .list-group-item:last-child {
+  margin-bottom: 0;
+}
+
+.fw-bold {
+  font-weight: 700 !important;
+  color: #2d3748;
+}
+
+.d-flex.align-items-start {
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .about-center-info {
+    padding: 2rem 0;
+  }
+  
+  .about-center-info .card {
+    margin: 0.5rem 0;
+  }
+}

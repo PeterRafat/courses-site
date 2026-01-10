@@ -12,6 +12,12 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'about', component: AboutComponent },
+  { path: 'contact', loadComponent: () => import('./pages/contact/contact.component').then(m => m.ContactComponent) },
+  { path: 'join-us', loadComponent: () => import('./pages/join-us/join-us.component').then(m => m.JoinUsComponent) },
+  { path: 'consulting-services', loadComponent: () => import('./pages/consulting-services/consulting-services.component').then(m => m.ConsultingServicesComponent) },
+  { path: 'training-services', loadComponent: () => import('./pages/training-services/training-services.component').then(m => m.TrainingServicesComponent) },
+
+  { path: 'training-guide', loadComponent: () => import('./pages/training-guide/training-guide.component').then(m => m.TrainingGuideComponent) },
   { path: 'courses', loadComponent: () => import('./pages/courses-list/courses-list.component').then(m => m.CoursesListComponent), canActivate: [authGuard] },
   { path: 'courses/:id', loadComponent: () => import('./pages/course-detail/course-detail.component').then(m => m.CourseDetailComponent), canActivate: [authGuard] },
   { path: 'videos/:id', loadComponent: () => import('./pages/video-player/video-player.component').then(m => m.VideoPlayerComponent), canActivate: [authGuard] },

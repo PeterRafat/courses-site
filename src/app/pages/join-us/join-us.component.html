@@ -1,0 +1,38 @@
+<div class="container my-5">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="text-center mb-4">انضم إلينا</h1>
+      <p class="text-center lead">نبحث دائمًا عن الأفراد الموهوبين والمتحمسين للانضمام إلى فريقنا. إذا كنت مهتمًا بالفرص المتاحة، يرجى ملء النموذج أدناه.</p>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <form #joinForm="ngForm" (ngSubmit)="onSubmit(joinForm)">
+        <div class="mb-3">
+          <label for="name" class="form-label">الاسم الكامل *</label>
+          <input type="text" class="form-control" id="name" name="name" required [(ngModel)]="formData.name">
+        </div>
+        
+        <div class="mb-3">
+          <label for="email" class="form-label">البريد الإلكتروني *</label>
+          <input type="email" class="form-control" id="email" name="email" required [(ngModel)]="formData.email">
+        </div>
+        
+        <div class="mb-3">
+          <label for="phone" class="form-label">رقم الهاتف *</label>
+          <input type="tel" class="form-control" id="phone" name="phone" required [(ngModel)]="formData.phone">
+        </div>
+        
+        <div class="mb-3">
+          <label for="message" class="form-label">رسالتك *</label>
+          <textarea class="form-control" id="message" name="message" rows="5" required [(ngModel)]="formData.message"></textarea>
+        </div>
+        
+        <div class="d-grid">
+          <button type="submit" class="btn btn-success btn-lg">تقديم الطلب</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
